@@ -4,12 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <style>
     /* --- Base & Variables --- */
     :root {
-      /* Dark mode variables */
       --bg-dark: #0F172A;
       --bg-light: #1E293B;
       --text-primary: #CBD5E1;
@@ -17,10 +15,8 @@
       --accent: #38BDF8;
       --table-border: #334155;
       --hover-bg: rgba(255, 255, 255, 0.03);
-      --chart-text: #CBD5E1;
     }
 
-    /* Light mode variables */
     [data-theme="light"] {
       --bg-dark: #F8FAFC;
       --bg-light: #FFFFFF;
@@ -29,7 +25,6 @@
       --accent: #0284C7;
       --table-border: #E5E7EB;
       --hover-bg: rgba(0, 0, 0, 0.03);
-      --chart-text: #1F2937;
     }
 
     *, *::before, *::after {
@@ -45,57 +40,19 @@
       transition: background-color 0.3s, color 0.3s;
     }
 
-    .visually-hidden {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    /* --- Layout: Sidebar --- */
+    /* --- Sidebar --- */
     .sidebar {
       width: 250px;
       background-color: var(--bg-light);
       padding: 1.5em;
       height: 100vh;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
       transition: background-color 0.3s;
     }
-    
-    /* --- Layout: Main Content --- */
-    .main-content {
-      flex-grow: 1;
-      padding: 1.5em;
-      overflow-y: auto;
-      height: 100vh;
-    }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2em;
-    }
-
-    h1, h2 {
-      color: var(--text-primary);
-      margin: 0;
-    }
-    
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1.5em;
-    }
-
-    /* --- Component: Sidebar --- */
     .sidebar-header {
       font-size: 1.5em;
       font-weight: bold;
@@ -135,31 +92,37 @@
       width: 20px;
       text-align: center;
     }
-    
-    /* --- Component: Card --- */
-    .card {
-      background-color: var(--bg-light);
+
+    /* --- Main Content --- */
+    .main-content {
+      flex-grow: 1;
       padding: 1.5em;
-      border-radius: 12px;
-      margin-bottom: 1.5em;
-      transition: background-color 0.3s;
+      overflow-y: auto;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* --- Component: KPI Cards --- */
-    .kpi-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2em;
+    }
+
+    h1 {
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
       gap: 1.5em;
     }
 
-    /* --- Component: Table --- */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1.5em;
-    }
-    
-    /* --- Component: Theme Toggle --- */
+    /* --- Theme Toggle --- */
     .theme-toggle {
       background: none;
       border: none;
@@ -175,7 +138,24 @@
       background-color: var(--hover-bg);
     }
 
-    /* --- Component: User Dropdown --- */
+    /* --- Sidebar Toggle (mobile) --- */
+    .sidebar-toggle {
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.2em;
+      cursor: pointer;
+      padding: 0.5em;
+      border-radius: 8px;
+      transition: background-color 0.2s;
+      display: none;
+    }
+
+    .sidebar-toggle:hover {
+      background-color: var(--hover-bg);
+    }
+
+    /* --- User Dropdown --- */
     .user-dropdown {
       position: relative;
     }
@@ -246,33 +226,99 @@
       background-color: var(--hover-bg);
       color: var(--text-primary);
     }
+
+    /* --- Card & Iframe Wrapper --- */
+    .card {
+      background-color: var(--bg-light);
+      padding: 0;
+      border-radius: 12px;
+      height: calc(100vh - 100px);
+      height: calc(100dvh - 100px); /* Fill screen minus header */
+      position: relative;
+      overflow: hidden;
+    }
+
+    .iframe-wrapper {
+      position: absolute;
+      top: -40px;      
+      bottom: -40px;   
+      left: 0;
+      right: 0;
+      overflow: hidden;
+      height: calc(100% + 100px);
+    }
+
+    .iframe-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* --- Reduced Motion --- */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* --- Responsive Sidebar --- */
+    @media (max-width: 900px) {
+      .sidebar-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease-in-out, background-color 0.3s;
+        z-index: 20;
+      }
+
+      body.sidebar-open .sidebar {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        height: 100dvh; /* ensure main fills remaining viewport */
+      }
+    }
   </style>
 </head>
 <body>
-  <nav class="sidebar">
-    <div class="sidebar-header">
-      Revartix Platform
-    </div>
+  <nav class="sidebar" id="sidebar" aria-label="Primary">
+    <div class="sidebar-header">Revartix Platform</div>
     <div class="sidebar-nav">
       <ul>
-        <li><a href="#" class="active"><i class="fa-solid fa-fw fa-chart-pie"></i> Reports</a></li>
-        <li><a href="#"><i class="fa-solid fa-fw fa-gear"></i> Settings</a></li>
+        <li><a href="#" class="active"><i class="fa-solid fa-fw fa-chart-pie" aria-hidden="true"></i> <span>Reports</span></a></li>
+        <li><a href="#"><i class="fa-solid fa-fw fa-gear" aria-hidden="true"></i> <span>Settings</span></a></li>
       </ul>
     </div>
   </nav>
 
   <main class="main-content">
     <header class="header">
-      <h1>Dashboard</h1>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle navigation" aria-controls="sidebar" aria-expanded="false">
+          <i class="fas fa-bars" aria-hidden="true"></i>
+        </button>
+        <h1>Dashboard</h1>
+      </div>
       <div class="header-right">
         <% if (user) { %>
           <div class="user-dropdown" id="user-dropdown">
-            <button class="dropdown-toggle" id="dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+            <button class="dropdown-toggle" id="dropdown-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="dropdown-menu">
               <span><%= user.name %></span>
               <i class="fas fa-chevron-down" aria-hidden="true"></i>
             </button>
-            <div class="dropdown-menu" id="dropdown-menu">
-              <a href="/logout" class="dropdown-item">
+            <div class="dropdown-menu" id="dropdown-menu" role="menu">
+              <a href="/logout" class="dropdown-item" role="menuitem" tabindex="-1">
                 <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
                 <span>Logout</span>
               </a>
@@ -285,100 +331,59 @@
       </div>
     </header>
 
-    <section class="kpi-container card" aria-labelledby="kpi-heading">
-      <h2 id="kpi-heading" class="visually-hidden">Key Performance Indicators</h2>
-      <div class="kpi-card">
-        <p class="kpi-title">Total Readings</p>
-        <p class="kpi-value" id="total-readings">0</p>
+    <!-- Dashboard Card -->
+    <section class="card">
+      <div class="iframe-wrapper">
+        <iframe 
+          src="<%= (grafanaPublicBase || 'http://localhost:3000/public-dashboards') %>/<%= (dashboardId || '06e4035d72ae479fb65d30ba7edb72d6') %>?theme=<%= (initialTheme || 'dark') %>"
+          id="embedded-dashboard"
+          title="Analytics dashboard"
+          loading="lazy"
+          referrerpolicy="no-referrer"
+          sandbox="allow-same-origin allow-scripts allow-forms allow-popups">
+        </iframe>
       </div>
-      <div class="kpi-card">
-        <p class="kpi-title">Unique Devices</p>
-        <p class="kpi-value" id="unique-devices">0</p>
-      </div>
-      <div class="kpi-card">
-        <p class="kpi-title">Overall Average</p>
-        <p class="kpi-value" id="average-value">0</p>
-      </div>
-    </section>
-
-    <section class="card" aria-labelledby="chart-heading">
-       <h2 id="chart-heading" class="visually-hidden">Average Data Value Chart</h2>
-       <div id="main-chart" style="width: 100%; height: 400px;"></div>
-    </section>
-
-    <section class="card table-container" aria-labelledby="table-heading">
-      <h2 id="table-heading">Detailed Readings</h2>
-      <table>
-        <thead>
-          <tr>
-            <th scope="col">Device Name</th>
-            <th scope="col">Data Value</th>
-            <th scope="col">Timestamp</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% if (records && records.length > 0) { %>
-            <% records.forEach(record => { %>
-              <tr>
-                <td><%= record.x_name || 'N/A' %></td>
-                <td><%= record.x_studio_data_value %></td>
-                <td><%= record.x_studio_timestamp %></td>
-              </tr>
-            <% }) %>
-          <% } else { %>
-            <tr>
-              <td colspan="3">No records found.</td>
-            </tr>
-          <% } %>
-        </tbody>
-      </table>
     </section>
   </main>
   
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Safely parse EJS data
-      const records = <%- JSON.stringify(records || []) %>;
-      let myChartInstance = null;
-      let chartOption = null;
+      const iframe = document.getElementById('embedded-dashboard');
+      const themeButton = document.getElementById('theme-toggle');
+      const themeIcon = themeButton.querySelector('i');
+      const htmlEl = document.documentElement;
+      const bodyEl = document.body;
+      const sidebarToggle = document.getElementById('sidebar-toggle');
+      const sidebar = document.getElementById('sidebar');
 
-      /**
-       * Initializes and manages the theme toggle functionality.
-       */
-      function setupThemeToggle() {
-        const themeButton = document.getElementById('theme-toggle');
-        const themeIcon = themeButton.querySelector('i');
-        const htmlEl = document.documentElement;
+      // Apply theme to page & iframe
+      function applyTheme(theme) {
+        htmlEl.setAttribute('data-theme', theme);
+        themeIcon.className = theme === 'light' ? 'fas fa-sun' : 'fas fa-moon';
+        localStorage.setItem('theme', theme);
 
-        const applyTheme = (theme) => {
-          htmlEl.setAttribute('data-theme', theme);
-          themeIcon.className = theme === 'light' ? 'fas fa-sun' : 'fas fa-moon';
-          localStorage.setItem('theme', theme);
-          
-          // Re-render chart with the new theme if it exists
-          if (myChartInstance) {
-            myChartInstance.dispose();
-            myChartInstance = echarts.init(document.getElementById('main-chart'), theme);
-            myChartInstance.setOption(chartOption);
-          }
-        };
-        
-        // Set initial theme based on localStorage
-        const currentTheme = localStorage.getItem('theme') || 'dark';
-        applyTheme(currentTheme);
-
-        themeButton.addEventListener('click', () => {
-          const newTheme = htmlEl.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-          applyTheme(newTheme);
-        });
+        // Update Grafana iframe
+        if (iframe) {
+          const baseUrl = "<%= (grafanaPublicBase || 'http://localhost:3000/public-dashboards') %>/<%= (dashboardId || '06e4035d72ae479fb65d30ba7edb72d6') %>";
+          iframe.src = `${baseUrl}?theme=${theme}`;
+        }
       }
 
-      /**
-       * Initializes and manages the user profile dropdown.
-       */
+      // Initialize theme
+      const preferredTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      const currentTheme = localStorage.getItem('theme') || ("<%= (initialTheme || '') %>" || preferredTheme);
+      applyTheme(currentTheme);
+
+      // Theme toggle click
+      themeButton.addEventListener('click', () => {
+        const newTheme = htmlEl.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        applyTheme(newTheme);
+      });
+
+      // User dropdown
       function setupUserDropdown() {
         const dropdown = document.getElementById('user-dropdown');
-        if (!dropdown) return; // Exit if dropdown doesn't exist
+        if (!dropdown) return;
 
         const toggle = dropdown.querySelector('#dropdown-toggle');
         const menu = dropdown.querySelector('#dropdown-menu');
@@ -388,9 +393,13 @@
           const isExpanded = menu.classList.toggle('show');
           dropdown.classList.toggle('open');
           toggle.setAttribute('aria-expanded', isExpanded);
+          if (isExpanded) {
+            // focus first item for accessibility
+            const firstItem = menu.querySelector('[role="menuitem"]');
+            firstItem && firstItem.focus();
+          }
         });
 
-        // Close dropdown when clicking anywhere else on the page
         document.addEventListener('click', () => {
           if (menu.classList.contains('show')) {
             menu.classList.remove('show');
@@ -398,77 +407,46 @@
             toggle.setAttribute('aria-expanded', 'false');
           }
         });
-      }
 
-      /**
-       * Renders all dashboard components like KPIs and Charts.
-       */
-      function renderDashboard() {
-        try {
-          const validRecords = records.filter(r => r && r.x_name);
-          if (validRecords.length === 0) {
-            document.getElementById('main-chart').innerText = "No data available to display.";
-            return;
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && menu.classList.contains('show')) {
+            menu.classList.remove('show');
+            dropdown.classList.remove('open');
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.focus();
           }
-
-          updateKPIs(validRecords);
-          renderChart(validRecords);
-        
-        } catch (error) {
-          console.error("Error rendering dashboard:", error);
-          const chartEl = document.getElementById('main-chart');
-          if(chartEl) chartEl.innerText = "Could not load chart data due to an error.";
-        }
-      }
-      
-      /**
-       * Updates the KPI cards with calculated data.
-       * @param {Array} data The array of valid records.
-       */
-      function updateKPIs(data) {
-        document.getElementById('total-readings').innerText = data.length;
-        document.getElementById('unique-devices').innerText = new Set(data.map(r => r.x_name)).size;
-        const average = (data.reduce((sum, r) => sum + (parseFloat(r.x_studio_data_value) || 0), 0) / data.length);
-        document.getElementById('average-value').innerText = average.toFixed(2);
+        });
       }
 
-      /**
-       * Renders the main bar chart using ECharts.
-       * @param {Array} data The array of valid records.
-       */
-      function renderChart(data) {
-        const chartDom = document.getElementById('main-chart');
-        const deviceData = {};
-        
-        data.forEach(record => {
-          const deviceName = record.x_name;
-          if (!deviceData[deviceName]) deviceData[deviceName] = { sum: 0, count: 0 };
-          deviceData[deviceName].sum += (parseFloat(record.x_studio_data_value) || 0);
-          deviceData[deviceName].count += 1;
+      setupUserDropdown();
+
+      // Sidebar toggle (mobile)
+      if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const willOpen = !bodyEl.classList.contains('sidebar-open');
+          bodyEl.classList.toggle('sidebar-open');
+          sidebarToggle.setAttribute('aria-expanded', String(willOpen));
         });
 
-        const deviceNames = Object.keys(deviceData);
-        const averageValues = deviceNames.map(name => (deviceData[name].sum / deviceData[name].count).toFixed(2));
-        
-        const initialTheme = localStorage.getItem('theme') || 'dark';
-        myChartInstance = echarts.init(chartDom, initialTheme);
+        // Close sidebar when clicking outside
+        document.addEventListener('click', (e) => {
+          if (!sidebar.contains(e.target) && bodyEl.classList.contains('sidebar-open')) {
+            bodyEl.classList.remove('sidebar-open');
+            sidebarToggle.setAttribute('aria-expanded', 'false');
+          }
+        });
 
-        chartOption = {
-          title: { text: 'Average Data Value per Device', textStyle: { color: 'var(--chart-text)' } },
-          tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-          xAxis: { type: 'category', data: deviceNames, axisLabel: { color: 'var(--text-secondary)' } },
-          yAxis: { type: 'value', axisLabel: { color: 'var(--text-secondary)' } },
-          series: [{ name: 'Average Value', type: 'bar', data: averageValues }],
-          grid: { top: 60, right: 20, bottom: 30, left: 50 }
-        };
-        
-        myChartInstance.setOption(chartOption);
+        // Close on Escape
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && bodyEl.classList.contains('sidebar-open')) {
+            bodyEl.classList.remove('sidebar-open');
+            sidebarToggle.setAttribute('aria-expanded', 'false');
+            sidebarToggle.focus();
+          }
+        });
       }
-      
-      // --- Initialize all parts of the application ---
-      renderDashboard();
-      setupThemeToggle();
-      setupUserDropdown();
     });
   </script>
 </body>
