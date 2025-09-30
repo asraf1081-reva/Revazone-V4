@@ -6,6 +6,11 @@
     <title>Dashboard | Reva Platform</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,57 +67,6 @@
         </main>
     </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- Theme Toggle Logic ---
-        const themeButton = document.getElementById('theme-toggle');
-        const themeIcon = themeButton.querySelector('i');
-        const htmlEl = document.documentElement;
-        const iframe = document.getElementById('embedded-dashboard');
-
-        function applyTheme(theme) {
-            localStorage.setItem('theme', theme);
-            if (theme === 'dark') {
-                htmlEl.classList.add('dark');
-                themeIcon.className = 'fas fa-sun';
-            } else {
-                htmlEl.classList.remove('dark');
-                themeIcon.className = 'fas fa-moon';
-            }
-
-            // Update iframe theme if it exists
-            if (iframe) {
-                const baseUrl = "<%= grafanaPublicBase %>/<%= dashboardId %>";
-                iframe.src = `${baseUrl}?theme=${theme}`;
-            }
-        }
-
-        const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        applyTheme(savedTheme);
-
-        themeButton.addEventListener('click', () => {
-            const newTheme = htmlEl.classList.contains('dark') ? 'light' : 'dark';
-            applyTheme(newTheme);
-        });
-
-        // --- User Dropdown Logic ---
-        const dropdown = document.getElementById('user-dropdown');
-        if (dropdown) {
-            const toggle = document.getElementById('dropdown-toggle');
-            const menu = document.getElementById('dropdown-menu');
-            
-            toggle.addEventListener('click', (event) => {
-                event.stopPropagation();
-                menu.classList.toggle('hidden');
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!dropdown.contains(e.target)) {
-                    menu.classList.add('hidden');
-                }
-            });
-        }
-    });
-</script>
+    <%- include('partials/scripts') %>
 </body>
 </html>
