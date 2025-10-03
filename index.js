@@ -204,7 +204,7 @@ app.get('/dashboard', requireCustomer, (req, res) => {
         return sum + debitPayments.reduce((subSum, p) => subSum + parseNumber(p.amount), 0);
     }, 0);
 
-    // In a real app, you would process your chart data here
+    // In a real app, you would process your chart data here 
 
     res.render('Customer/dashboards', {
         user: req.session.user,
