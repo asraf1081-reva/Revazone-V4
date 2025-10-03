@@ -191,7 +191,7 @@ app.get('/home', requireCustomer, (req, res) => {
 });
 
 // Dashboard Page Route
-app.get('/dashboard', requireCustomer, (req, res) => {
+app.get('/dashboards', requireCustomer, (req, res) => {
     const parseNumber = (str) => {
         if (typeof str !== 'string') return 0;
         return parseFloat(str.replace(/[^0-9.-]+/g, "")) || 0;
@@ -208,7 +208,7 @@ app.get('/dashboard', requireCustomer, (req, res) => {
 
     res.render('Customer/dashboards', {
         user: req.session.user,
-        activePage: 'dashboard',
+        activePage: 'dashboards',
         kpis: { totalMeters, activeMeters, totalConsumption, totalBilled: Math.abs(totalBilled) },
         charts: { /* chart data would go here */ },
         attentionMeters: masterMeterData.filter(m => m.status === 'Needs Attention'),
