@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Management | Reva Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        .modal-backdrop { background-color: rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-gray-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
+    <div class="flex">
+
+        <%- include('partials_ad/sidebar_ad') %>
+
+        <main class="flex-1 h-screen overflow-y-auto p-6 md:p-8">
+            <!-- Header -->
+            <header class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Customer Management</h1>
+                    <p class="text-slate-500 dark:text-slate-400 mt-1">Welcome back, <%= user.name %>!</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="relative" id="user-dropdown">
+                        <button id="dropdown-toggle" class="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">
+                            <span class="font-semibold text-sm"><%= user.name %></span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="dropdown-menu" class="absolute hidden right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl z-10 border border-slate-200 dark:border-slate-700 py-1">
+                            <a href="/logout" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                    <button id="theme-toggle" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Tabs Navigation -->
+            <div class="mb-6">
+                <div class="border-b border-slate-200 dark:border-gray-700">
+                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                        <a href="#" id="tab-profiles" class="tab-link border-red-500 text-red-600 dark:text-red-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Customer Profiles</a>
+                        <a href="#" id="tab-meters" class="tab-link border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-gray-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Meters & Tariffs</a>
+                        <a href="#" id="tab-documents" class="tab-link border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-gray-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Documents</a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Customer Profiles Content -->
+            <div id="content-profiles" class="tab-content">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="relative w-full max-w-xs">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" placeholder="Search customers..." class="w-full bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-700 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+                    <button id="add-customer-btn" class="bg-red-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2 whitespace-nowrap">
+                        <i class="fas fa-plus"></i>
+                        <span>Add Customer</span>
+                    </button>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-x-auto border border-slate-200 dark:border-gray-700">
+                    <table class="min-w-full">
+                        <thead class="bg-slate-50 dark:bg-gray-700/50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Customer ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Phone</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 dark:divide-gray-700">
+                             <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-600 dark:text-slate-300">SA-CUST-001</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-white">Abdullah Al-Qahtani</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">abdullah.q@email.com</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">+966 50 123 4567</td>
+                                <td class="px-6 py-4 whitespace-nowrap"><span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Active</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <a href="#" class="text-red-500 hover:underline mr-4">Edit</a>
+                                    <a href="#" class="text-red-500 hover:underline">Deactivate</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-600 dark:text-slate-300">SA-CUST-002</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-white">Fatima Al-Mutairi</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">fatima.m@email.com</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">+966 55 987 6543</td>
+                                <td class="px-6 py-4 whitespace-nowrap"><span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Active</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <a href="#" class="text-red-500 hover:underline mr-4">Edit</a>
+                                    <a href="#" class="text-red-500 hover:underline">Deactivate</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Meters & Tariffs Content -->
+            <div id="content-meters" class="tab-content hidden">
+                 <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
+                    <div class="relative w-full max-w-xs">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" placeholder="Search by Meter ID, Customer..." class="w-full bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-700 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+                    <button id="assign-new-meter-btn" class="bg-red-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2 whitespace-nowrap">
+                        <i class="fas fa-plus"></i>
+                        <span>Assign New Meter</span>
+                    </button>
+                </div>
+                
+                <h2 class="text-xl font-semibold mb-4 text-slate-900 dark:text-white">Registered Water Meters</h2>
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-x-auto border border-slate-200 dark:border-gray-700">
+                    <table class="min-w-full">
+                        <thead class="bg-slate-50 dark:bg-gray-700/50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Meter ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Assigned Customer</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Service Address</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Last Reading (m³)</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 dark:divide-gray-700">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">NWC-589745</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-white">Abdullah Al-Qahtani</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">4521 Prince Mohammed Bin Abdulaziz Rd, Al Olaya, Riyadh 12222</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">145.7</td>
+                                <td class="px-6 py-4 whitespace-nowrap"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Active</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"><a href="#" class="text-red-500 hover:underline manage-meter-btn">Manage</a></td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">NWC-365897</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-white">Fatima Al-Mutairi</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">8230 King Fahd Branch Rd, Al-Rawdah, Jeddah 23435</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">89.2</td>
+                                <td class="px-6 py-4 whitespace-nowrap"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Active</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"><a href="#" class="text-red-500 hover:underline manage-meter-btn">Manage</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h2 class="text-xl font-semibold mt-10 mb-4 text-slate-900 dark:text-white">Available Water Tariff Plans (NWC)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-slate-200 dark:border-gray-700">
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white">Residential Sector Tariff</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Tiered pricing for residential customers.</p>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex justify-between p-2 rounded bg-slate-50 dark:bg-gray-700/50"><span>Consumption 0 - 15 m³</span> <span class="font-semibold">0.10 SAR / m³</span></li>
+                            <li class="flex justify-between p-2 rounded bg-slate-50 dark:bg-gray-700/50"><span>Consumption 16 - 30 m³</span> <span class="font-semibold">1.00 SAR / m³</span></li>
+                            <li class="flex justify-between p-2 rounded bg-slate-50 dark:bg-gray-700/50"><span>Consumption 31 - 45 m³</span> <span class="font-semibold">3.00 SAR / m³</span></li>
+                            <li class="flex justify-between p-2 rounded bg-slate-50 dark:bg-gray-700/50"><span>Consumption > 45 m³</span> <span class="font-semibold">6.00 SAR / m³</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-slate-200 dark:border-gray-700">
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white">Commercial & Industrial Tariff</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Tiered pricing for non-residential customers.</p>
+                        <ul class="space-y-2 text-sm">
+                           <li class="flex justify-between p-2 rounded bg-slate-50 dark:bg-gray-700/50"><span>Consumption 0 - 50 m³</span> <span class="font-semibold">1.50 SAR / m³</span></li>
+                            <li class="flex justify-between p-2 rounded bg-slate-50 dark:bg-gray-700/50"><span>Consumption > 50 m³</span> <span class="font-semibold">7.00 SAR / m³</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documents Content -->
+             <div id="content-documents" class="tab-content hidden">
+                 <div class="flex justify-between items-center mb-6">
+                    <div class="relative w-full max-w-xs">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" placeholder="Search by document, customer..." class="w-full bg-white dark:bg-gray-800 border border-slate-300 dark:border-gray-700 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+                    <button class="bg-red-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2 whitespace-nowrap">
+                        <i class="fas fa-upload"></i>
+                        <span>Upload Document</span>
+                    </button>
+                </div>
+                 <div class="text-center p-12 bg-white dark:bg-gray-800 rounded-lg border-2 border-dashed border-slate-300 dark:border-gray-700">
+                     <i class="fas fa-folder-open text-5xl text-slate-400 mb-4"></i>
+                     <h3 class="text-xl font-semibold text-slate-700 dark:text-slate-200">No documents found.</h3>
+                     <p class="text-slate-500 dark:text-slate-400 mt-1">Upload a customer's first document to get started.</p>
+                 </div>
+             </div>
+        </main>
+    </div>
+    
+    <!-- Onboard Customer Modal -->
+    <div id="onboarding-modal" class="fixed inset-0 z-50 hidden items-center justify-center overflow-y-auto">
+        <div class="modal-backdrop fixed inset-0"></div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl m-4 z-10 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-5 border-b border-slate-200 dark:border-gray-700">
+                <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Onboard New Customer</h3>
+                <p id="step-indicator" class="text-sm font-medium text-slate-500 dark:text-slate-400">Step 1 of 3: Profile</p>
+                <button id="close-onboarding-modal-btn" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1">
+                <form id="onboarding-form">
+                    <!-- Step 1: Profile -->
+                    <div id="step-1-profile" class="step-content space-y-4">
+                        <h4 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2 border-b pb-2 border-slate-200 dark:border-gray-700">Customer Details</h4>
+                         <div>
+                            <label for="new-customer-name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Full Name</label>
+                            <input type="text" id="new-customer-name" placeholder="e.g., Omar Al-Harbi" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white dark:bg-gray-700 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="new-customer-email" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
+                            <input type="email" id="new-customer-email" placeholder="e.g., omar.h@email.com" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white dark:bg-gray-700 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="new-customer-phone" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Phone</label>
+                            <input type="tel" id="new-customer-phone" placeholder="e.g., +966 5X XXX XXXX" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white dark:bg-gray-700 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="new-customer-national-id" class="block text-sm font-medium text-slate-700 dark:text-slate-300">National ID</label>
+                            <input type="text" id="new-customer-national-id" placeholder="10-digit National ID number" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white dark:bg-gray-700 sm:text-sm">
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Meter & Address -->
+                     <div id="step-2-meter" class="step-content hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                            <div class="space-y-6">
+                                 <h4 class="text-lg font-semibold text-slate-800 dark:text-slate-200 border-b pb-2 border-slate-200 dark:border-gray-700">Meter Details</h4>
+                                 <div>
+                                    <label for="meter-id" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Meter ID / Serial Number</label>
+                                    <input type="text" id="meter-id" placeholder="e.g., NWC-123456" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white dark:bg-gray-700 sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="initial-reading" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Initial Reading (m³)</label>
+                                    <input type="number" step="0.1" id="initial-reading" placeholder="e.g., 0.0" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white dark:bg-gray-700 sm:text-sm">
+                                </div>
+                                 <div>
+                                    <label for="new-tariff-plan" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Assign Tariff Plan</label>
+                                    <select id="new-tariff-plan" class="mt-1 w-full rounded-md border-slate-300 dark:border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white dark:bg-gray-700 sm:text-sm">
+                                        <option>Residential Sector Tariff</option>
+                                        <option>Commercial & Industrial Tariff</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <h4 class="text-lg font-semibold text-slate-800 dark:text-slate-200 border-b pb-2 border-slate-200 dark:border-gray-700">Service Address</h4>
+                                <div>
+                                    <h5 class="text-sm font-medium text-slate-700 dark:text-slate-300">Saudi National Address</h5>
+                                    <div id="national-address-group" class="grid grid-cols-2 gap-4 mt-2">
+                                         <input type="text" name="building-no" placeholder="Building No." class="block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
+                                         <input type="text" name="street-name" placeholder="Street Name" class="block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
+                                         <input type="text" name="district" placeholder="District" class="block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
+                                         <input type="text" name="city" placeholder="City" class="block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
+                                         <input type="text" name="postal-code" placeholder="Postal Code" class="block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
+                                         <input type="text" name="additional-no" placeholder="Additional No." class="block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
+                                    </div>
+                                </div>
+                                 <div>
+                                    <label for="service-address-notes" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Address Notes (Optional)</label>
+                                    <div class="relative mt-1">
+                                        <textarea id="service-address-notes" rows="3" class="block w-full rounded-md border-slate-300 dark:border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white dark:bg-gray-700 sm:text-sm pr-24"></textarea>
+                                        <button type="button" id="generate-notes-btn" class="absolute bottom-2 right-2 bg-red-100 dark:bg-gray-600 text-red-700 dark:text-slate-200 text-xs font-semibold px-2 py-1 rounded-md hover:bg-red-200 dark:hover:bg-gray-500">
+                                            Generate ✨
+                                        </button>
+                                         <div id="notes-loader" class="absolute inset-0 bg-white/50 dark:bg-gray-800/50 hidden items-center justify-center rounded-md">
+                                            <div class="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Documents -->
+                    <div id="step-3-documents" class="step-content hidden">
+                        <h4 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 border-b pb-2 border-slate-200 dark:border-gray-700">Upload Documents</h4>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Required: National ID / Iqama, Tenancy Agreement (if applicable)</label>
+                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 dark:border-gray-600 border-dashed rounded-md">
+                                <div class="space-y-1 text-center">
+                                    <i class="fas fa-cloud-upload-alt text-4xl text-slate-400"></i>
+                                    <div class="flex text-sm text-slate-600 dark:text-slate-400">
+                                        <label for="file-upload" class="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-red-600 hover:text-red-500 focus-within:outline-none">
+                                            <span>Upload files</span>
+                                            <input id="file-upload" name="file-upload" type="file" class="sr-only" multiple>
+                                        </label>
+                                        <p class="pl-1">or drag and drop</p>
+                                    </div>
+                                    <p class="text-xs text-slate-500 dark:text-slate-500">PNG, JPG, PDF up to 10MB</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+             <div class="flex justify-between items-center p-5 border-t border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/50 rounded-b-lg">
+                <button id="back-step-btn" type="button" class="invisible bg-white dark:bg-gray-700 py-2 px-4 border border-slate-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-gray-600">Back</button>
+                <div>
+                    <button id="cancel-onboarding-btn" type="button" class="bg-white dark:bg-gray-700 py-2 px-4 border border-slate-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-gray-600">Cancel</button>
+                    <button id="next-step-btn" type="button" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Next</button>
+                    <button id="save-customer-btn" type="submit" form="onboarding-form" class="ml-3 hidden justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Save Customer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Meter Modal -->
+    <div id="manage-meter-modal" class="fixed inset-0 z-50 hidden items-center justify-center overflow-y-auto">
+        <div class="modal-backdrop fixed inset-0"></div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl m-4 z-10 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-5 border-b border-slate-200 dark:border-gray-700">
+                <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Manage Meter: <span id="modal-meter-id" class="font-mono"></span></h3>
+                <button id="close-meter-modal-btn" class="text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Left Column: Info & Actions -->
+                    <div class="md:col-span-1 space-y-6">
+                        <div>
+                            <h4 class="font-semibold text-slate-800 dark:text-slate-200 mb-2">Meter Details</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-300"><strong>Customer:</strong> <span id="modal-customer-name"></span></p>
+                            <p class="text-sm text-slate-600 dark:text-slate-300"><strong>Address:</strong> <span id="modal-service-address"></span></p>
+                        </div>
+                        <div>
+                            <label for="tariff-plan" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Change Tariff Plan</label>
+                            <select id="tariff-plan" name="tariff-plan" class="w-full rounded-md border-slate-300 dark:border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white dark:bg-gray-700 sm:text-sm">
+                                <option>Residential Sector Tariff</option>
+                                <option>Commercial & Industrial Tariff</option>
+                            </select>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-slate-800 dark:text-slate-200 mb-2">Remote Actions</h4>
+                            <div class="flex flex-col space-y-2">
+                                <button class="text-sm text-left w-full bg-slate-100 dark:bg-gray-700 hover:bg-slate-200 dark:hover:bg-gray-600 px-4 py-2 rounded-lg">Request On-Demand Reading</button>
+                                <button class="text-sm text-left w-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300 hover:bg-yellow-200 px-4 py-2 rounded-lg">Disconnect Service</button>
+                                <button class="text-sm text-left w-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 hover:bg-green-200 px-4 py-2 rounded-lg">Reconnect Service</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Column: Recent Activity -->
+                    <div class="md:col-span-2">
+                         <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-semibold text-slate-800 dark:text-slate-200">Recent Activity</h4>
+                            <button type="button" id="summarize-activity-btn" class="text-xs font-semibold text-red-600 dark:text-red-400 hover:underline">Summarize Activity ✨</button>
+                         </div>
+                         <div id="activity-summary-container" class="hidden mb-4 p-4 bg-slate-50 dark:bg-gray-700/50 rounded-lg relative">
+                            <p id="activity-summary-text" class="text-sm text-slate-700 dark:text-slate-200"></p>
+                            <div id="summary-loader" class="absolute inset-0 bg-white/50 dark:bg-gray-800/50 hidden items-center justify-center rounded-md">
+                                <div class="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                         </div>
+                         <div class="border rounded-lg overflow-hidden border-slate-200 dark:border-gray-700">
+                             <table id="activity-table" class="min-w-full">
+                                 <thead class="bg-slate-50 dark:bg-gray-700/50">
+                                     <tr>
+                                         <th class="px-4 py-2 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Date</th>
+                                         <th class="px-4 py-2 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Event</th>
+                                         <th class="px-4 py-2 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Reading (m³)</th>
+                                     </tr>
+                                 </thead>
+                                 <tbody class="divide-y divide-slate-200 dark:divide-gray-700">
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm">2024-10-01</td>
+                                        <td class="px-4 py-2 text-sm">Monthly Reading</td>
+                                        <td class="px-4 py-2 text-sm font-mono">145.7</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm">2024-09-25</td>
+                                        <td class="px-4 py-2 text-sm">Service Reconnected</td>
+                                        <td class="px-4 py-2 text-sm text-slate-500">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-2 text-sm">2024-09-24</td>
+                                        <td class="px-4 py-2 text-sm">Service Disconnected (Non-payment)</td>
+                                        <td class="px-4 py-2 text-sm text-slate-500">-</td>
+                                    </tr>
+                                 </tbody>
+                             </table>
+                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end items-center p-5 border-t border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/50 rounded-b-lg">
+                <button id="cancel-meter-modal-btn" type="button" class="bg-white dark:bg-gray-700 py-2 px-4 border border-slate-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-gray-600">Close</button>
+                <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Gemini API Call Function ---
+            async function callGeminiAPI(prompt) {
+                const apiKey = ""; // Keep this empty
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        console.error("API Error Response:", await response.text());
+                        return `Error: Received status ${response.status}. Please check the console for details.`;
+                    }
+
+                    const result = await response.json();
+                    if (result.candidates && result.candidates[0].content.parts[0].text) {
+                        return result.candidates[0].content.parts[0].text;
+                    } else {
+                        return "Sorry, I couldn't generate a response. The API returned an unexpected format.";
+                    }
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    return "An error occurred while contacting the AI service.";
+                }
+            }
+
+            // --- ✨ Gemini Feature: Generate Address Notes ---
+            const generateNotesBtn = document.getElementById('generate-notes-btn');
+            const notesTextarea = document.getElementById('service-address-notes');
+            const notesLoader = document.getElementById('notes-loader');
+            const addressGroup = document.getElementById('national-address-group');
+
+            generateNotesBtn.addEventListener('click', async () => {
+                const addressInputs = addressGroup.querySelectorAll('input');
+                let addressString = "";
+                addressInputs.forEach(input => {
+                    if (input.value) {
+                        addressString += `${input.placeholder}: ${input.value}, `;
+                    }
+                });
+
+                if (!addressString) {
+                    notesTextarea.value = "Please enter some address details first.";
+                    return;
+                }
+
+                notesLoader.classList.remove('hidden');
+                notesLoader.classList.add('flex');
+                generateNotesBtn.disabled = true;
+
+                const prompt = `Based on the following Saudi National Address, generate a brief, one-sentence helpful note in English for a technician to locate the property and water meter. Focus on practical landmarks if possible. Address: ${addressString.slice(0, -2)}`;
+                
+                const result = await callGeminiAPI(prompt);
+                notesTextarea.value = result;
+
+                notesLoader.classList.add('hidden');
+                notesLoader.classList.remove('flex');
+                generateNotesBtn.disabled = false;
+            });
+
+
+            // --- ✨ Gemini Feature: Summarize Meter Activity ---
+            const summarizeBtn = document.getElementById('summarize-activity-btn');
+            const summaryContainer = document.getElementById('activity-summary-container');
+            const summaryText = document.getElementById('activity-summary-text');
+            const summaryLoader = document.getElementById('summary-loader');
+
+            summarizeBtn.addEventListener('click', async () => {
+                const activityTable = document.getElementById('activity-table');
+                const rows = activityTable.querySelectorAll('tbody tr');
+                let activityData = "Date, Event, Reading (m³)\n";
+                rows.forEach(row => {
+                    activityData += `${row.cells[0].textContent}, ${row.cells[1].textContent}, ${row.cells[2].textContent}\n`;
+                });
+
+                summaryContainer.classList.remove('hidden');
+                summaryText.classList.add('hidden');
+                summaryLoader.classList.remove('hidden');
+                summaryLoader.classList.add('flex');
+                summarizeBtn.disabled = true;
+
+                const prompt = `You are a helpful assistant for a water utility company in Saudi Arabia. Summarize the following water meter activity for a customer service agent. Highlight important events like disconnections or unusual readings in a concise, professional paragraph. Activity:\n${activityData}`;
+
+                const result = await callGeminiAPI(prompt);
+                summaryText.textContent = result;
+                
+                summaryLoader.classList.add('hidden');
+                summaryLoader.classList.remove('flex');
+                summaryText.classList.remove('hidden');
+                summarizeBtn.disabled = false;
+            });
+
+            // --- Existing Tab and Modal Logic ---
+            const tabs = document.querySelectorAll('.tab-link');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = tab.id.replace('tab-', 'content-');
+                    tabs.forEach(t => {
+                        t.classList.remove('border-red-500', 'text-red-600', 'dark:text-red-400');
+                        t.classList.add('border-transparent', 'text-slate-500', 'dark:text-slate-400');
+                    });
+                    tab.classList.add('border-red-500', 'text-red-600', 'dark:text-red-400');
+                    tab.classList.remove('border-transparent', 'text-slate-500', 'dark:text-slate-400');
+                    contents.forEach(content => {
+                        content.classList.toggle('hidden', content.id !== targetId);
+                    });
+                });
+            });
+
+            // --- Onboard Customer Modal (Wizard) ---
+            const onboardingModal = document.getElementById('onboarding-modal');
+            const openAddCustomerBtn = document.getElementById('add-customer-btn');
+            const openAssignMeterBtn = document.getElementById('assign-new-meter-btn');
+            const closeOnboardingBtn = document.getElementById('close-onboarding-modal-btn');
+            const cancelOnboardingBtn = document.getElementById('cancel-onboarding-btn');
+            const onboardingBackdrop = onboardingModal.querySelector('.modal-backdrop');
+
+            const backBtn = document.getElementById('back-step-btn');
+            const nextBtn = document.getElementById('next-step-btn');
+            const saveBtn = document.getElementById('save-customer-btn');
+            const stepIndicator = document.getElementById('step-indicator');
+            const steps = onboardingModal.querySelectorAll('.step-content');
+            let currentStep = 1;
+
+            const stepTitles = ["Step 1 of 3: Profile", "Step 2 of 3: Meter & Address", "Step 3 of 3: Documents"];
+
+            function updateWizardView() {
+                steps.forEach((step, index) => {
+                    step.classList.toggle('hidden', (index + 1) !== currentStep);
+                });
+                stepIndicator.textContent = stepTitles[currentStep - 1];
+                backBtn.classList.toggle('invisible', currentStep === 1);
+                nextBtn.classList.toggle('hidden', currentStep === 3);
+                saveBtn.classList.toggle('hidden', currentStep !== 3);
+            }
+
+            const openOnboardingModal = () => {
+                currentStep = 1;
+                updateWizardView();
+                onboardingModal.classList.remove('hidden');
+                onboardingModal.classList.add('flex');
+            };
+
+            const closeOnboardingModal = () => {
+                onboardingModal.classList.add('hidden');
+                onboardingModal.classList.remove('flex');
+            };
+
+            openAddCustomerBtn.addEventListener('click', openOnboardingModal);
+            openAssignMeterBtn.addEventListener('click', openOnboardingModal);
+            closeOnboardingBtn.addEventListener('click', closeOnboardingModal);
+            cancelOnboardingBtn.addEventListener('click', closeOnboardingModal);
+            onboardingBackdrop.addEventListener('click', closeOnboardingModal);
+
+            nextBtn.addEventListener('click', () => {
+                if (currentStep < 3) {
+                    currentStep++;
+                    updateWizardView();
+                }
+            });
+
+            backBtn.addEventListener('click', () => {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateWizardView();
+                }
+            });
+
+            // --- Manage Meter Modal ---
+            const manageModal = document.getElementById('manage-meter-modal');
+            const manageBtns = document.querySelectorAll('.manage-meter-btn');
+            const closeModalBtn = document.getElementById('close-meter-modal-btn');
+            const cancelModalBtn = document.getElementById('cancel-meter-modal-btn');
+            const manageBackdrop = manageModal.querySelector('.modal-backdrop');
+
+            const openManageModal = (e) => {
+                e.preventDefault();
+                const row = e.target.closest('tr');
+                document.getElementById('modal-meter-id').textContent = row.cells[0].textContent;
+                document.getElementById('modal-customer-name').textContent = row.cells[1].textContent;
+                document.getElementById('modal-service-address').textContent = row.cells[2].textContent;
+                manageModal.classList.remove('hidden');
+                manageModal.classList.add('flex');
+            };
+            const closeManageModal = () => {
+                manageModal.classList.add('hidden');
+                manageModal.classList.remove('flex');
+                summaryContainer.classList.add('hidden');
+                summaryText.textContent = '';
+            };
+
+            manageBtns.forEach(btn => btn.addEventListener('click', openManageModal));
+            closeModalBtn.addEventListener('click', closeManageModal);
+            cancelModalBtn.addEventListener('click', closeManageModal);
+            manageBackdrop.addEventListener('click', closeManageModal);
+        });
+    </script>
+    <%- include('partials_ad/scripts_ad') %>
+</body>
+</html>
+

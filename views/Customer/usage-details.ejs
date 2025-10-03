@@ -86,8 +86,7 @@
                         <thead>
                             <tr>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Meter ID</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Last Reading (gal)</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Amount</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Meter Number</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Location</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Building Type</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
@@ -108,7 +107,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             const metersData = <%- JSON.stringify(data) %>;
             
-            // --- MAP ---
             const map = L.map('map', { attributionControl: false }).setView([24.7136, 46.6753], 11);
             let currentTileLayer = null;
 
@@ -134,8 +132,7 @@
             };
 
             let markersLayer = new L.LayerGroup().addTo(map);
-
-            // --- ELEMENTS ---
+            
             const searchBar = document.getElementById('search-bar');
             const buildingTypeFilter = document.getElementById('building-type-filter');
             const statusFilter = document.getElementById('status-filter');
@@ -144,7 +141,6 @@
             const closeModalBtn = document.getElementById('modal-close-button');
             const themeButton = document.getElementById('theme-toggle');
 
-            // --- HELPER FUNCTIONS ---
             const getStatusBadgeHTML = (status) => {
                 let statusClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
                 let dotClass = 'bg-yellow-500';
@@ -158,17 +154,17 @@
                 return `<span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${statusClass}"><span class="w-2 h-2 rounded-full ${dotClass}"></span> ${status}</span>`;
             };
 
-            // --- MODAL LOGIC ---
             const openModal = (meterId) => {
                 const meter = metersData.find(m => m.id === meterId);
                 if (!meter) return;
                 
                 document.getElementById('modal-meter-id').textContent = meter.id.replace('#','');
                 document.getElementById('modal-meter-location').textContent = meter.locationName;
+                document.getElementById('modal-meter-number').textContent = meter.meterNumber;
                 document.getElementById('modal-meter-status').innerHTML = getStatusBadgeHTML(meter.status);
                 document.getElementById('modal-meter-building').textContent = meter.buildingType;
-                document.getElementById('modal-meter-last').textContent = meter.lastReading.toLocaleString() + ' gal';
-                document.getElementById('modal-meter-total').textContent = meter.totalReadings.toLocaleString() + ' gal';
+                document.getElementById('modal-meter-last').textContent = meter.lastReading;
+                document.getElementById('modal-meter-total').textContent = meter.totalReadings;
 
                 const paymentBody = document.getElementById('modal-payment-body');
                 paymentBody.innerHTML = '';
@@ -176,6 +172,7 @@
                     const row = `
                         <tr>
                             <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">${p.date}</td>
+                            <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">${meter.billNumber}</td>
                             <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">${p.description}</td>
                             <td class="px-4 py-3 text-sm font-semibold ${p.type === 'Credit' ? 'text-green-500' : 'text-red-500'}">${p.amount}</td>
                         </tr>`;
@@ -185,15 +182,13 @@
             };
             const closeModal = () => modal.classList.add('hidden');
 
-            // --- UPDATE FUNCTIONS ---
             const updateTable = (data) => {
                 tableBody.innerHTML = '';
                 data.forEach(meter => {
                     const row = `
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#C03B2B]">${meter.id}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">${meter.lastReading.toLocaleString()}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">${meter.amount}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">${meter.meterNumber}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">${meter.locationName}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">${meter.buildingType}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">${getStatusBadgeHTML(meter.status)}</td>
@@ -216,8 +211,8 @@
                         <p><strong>Status:</strong> ${getStatusBadgeHTML(meter.status)}</p>
                         <p><strong>Location:</strong> ${meter.locationName}</p>
                         <hr class="border-slate-600 my-1">
-                        <p><strong>Last Reading:</strong> ${meter.lastReading.toLocaleString()} gal</p>
-                        <p><strong>Total Readings:</strong> ${meter.totalReadings.toLocaleString()} gal</p>
+                        <p><strong>Last Reading:</strong> ${meter.lastReading}</p>
+                        <p><strong>Total Readings:</strong> ${meter.totalReadings}</p>
                         <p><strong>Amount:</strong> ${meter.amount}</p>`;
                     L.marker([meter.lat, meter.lng], { icon: markerIcon }).addTo(markersLayer)
                         .bindPopup(popupContent);
@@ -241,7 +236,6 @@
                 updateMapMarkers(filteredMeters);
             };
 
-            // --- EVENT LISTENERS ---
             tableBody.addEventListener('click', (e) => {
                 if (e.target.classList.contains('view-details-btn')) {
                     e.preventDefault();
@@ -262,7 +256,6 @@
                 });
             }
             
-            // --- INITIAL LOAD ---
             updateDisplay();
             updateMapTheme();
         });

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Center | Reva Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        .modal-backdrop { background-color: rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-gray-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
+    <div class="flex">
+
+        <%- include('partials_ad/sidebar_ad') %>
+
+        <main class="flex-1 h-screen overflow-y-auto p-6 md:p-8">
+            <!-- Header -->
+            <header class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Customer Support Center</h1>
+                    <p class="text-slate-500 dark:text-slate-400 mt-1">Manage tickets, monitor SLAs, and review customer interactions.</p>
+                </div>
+                 <div class="flex items-center gap-4">
+                    <div class="relative" id="user-dropdown">
+                        <button id="dropdown-toggle" class="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">
+                            <span class="font-semibold text-sm"><%= user.name %></span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="dropdown-menu" class="absolute hidden right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl z-20 border border-slate-200 dark:border-slate-700 py-1">
+                            <a href="/logout" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                    <button id="theme-toggle" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Tabs Navigation -->
+            <div class="mb-6">
+                <div class="border-b border-slate-200 dark:border-gray-700">
+                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                        <a href="#" id="tab-tickets" class="tab-link border-red-500 text-red-600 dark:text-red-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Ticketing System</a>
+                        <a href="#" id="tab-chat" class="tab-link border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-gray-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Chat Logs</a>
+                        <a href="#" id="tab-sla" class="tab-link border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-gray-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">SLA Monitoring</a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Ticketing System Content -->
+            <div id="content-tickets" class="tab-content space-y-6">
+                <!-- KPI Cards -->
+                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow border border-slate-200 dark:border-gray-700"><p class="text-sm text-slate-500 dark:text-slate-400">Open Tickets</p><p class="text-3xl font-bold mt-1 text-red-500">24</p></div>
+                    <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow border border-slate-200 dark:border-gray-700"><p class="text-sm text-slate-500 dark:text-slate-400">Pending Customer Reply</p><p class="text-3xl font-bold mt-1 text-yellow-500">12</p></div>
+                    <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow border border-slate-200 dark:border-gray-700"><p class="text-sm text-slate-500 dark:text-slate-400">Resolved Today</p><p class="text-3xl font-bold mt-1 text-green-500">8</p></div>
+                    <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow border border-slate-200 dark:border-gray-700"><p class="text-sm text-slate-500 dark:text-slate-400">Avg. Response Time</p><p class="text-3xl font-bold mt-1 text-blue-500">3.2h</p></div>
+                </div>
+                
+                <!-- Ticket Table -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-slate-200 dark:border-gray-700">
+                    <div class="p-4 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-slate-800 dark:text-white">All Tickets</h3>
+                        <button id="create-ticket-btn" class="bg-red-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-700 text-sm flex items-center gap-2"><i class="fas fa-plus"></i> Create New Ticket</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead class="bg-slate-50 dark:bg-gray-700/50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Ticket ID</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Customer</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Subject</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Priority</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Last Update</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-gray-700">
+                                <tr>
+                                    <td class="px-6 py-4 font-mono text-sm">#78901</td>
+                                    <td class="px-6 py-4 font-semibold">Fatima Al-Mutairi</td>
+                                    <td class="px-6 py-4">Incorrect invoice amount</td>
+                                    <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">Open</span></td>
+                                    <td class="px-6 py-4"><span class="font-bold text-red-500">High</span></td>
+                                    <td class="px-6 py-4 text-sm text-slate-500">2h ago</td>
+                                    <td class="px-6 py-4 text-center"><button class="view-ticket-btn text-red-500 hover:underline text-sm font-semibold">View</button></td>
+                                </tr>
+                                 <tr>
+                                    <td class="px-6 py-4 font-mono text-sm">#78900</td>
+                                    <td class="px-6 py-4 font-semibold">Abdullah Al-Qahtani</td>
+                                    <td class="px-6 py-4">Question about my tariff</td>
+                                    <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">Pending</span></td>
+                                    <td class="px-6 py-4"><span class="font-bold text-yellow-500">Medium</span></td>
+                                    <td class="px-6 py-4 text-sm text-slate-500">1 day ago</td>
+                                    <td class="px-6 py-4 text-center"><button class="view-ticket-btn text-red-500 hover:underline text-sm font-semibold">View</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-mono text-sm">#78899</td>
+                                    <td class="px-6 py-4 font-semibold">Omar Al-Harbi</td>
+                                    <td class="px-6 py-4">Water meter not reporting</td>
+                                    <td class="px-6 py-4"><span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Resolved</span></td>
+                                    <td class="px-6 py-4"><span class="font-bold text-slate-500">Low</span></td>
+                                    <td class="px-6 py-4 text-sm text-slate-500">3 days ago</td>
+                                    <td class="px-6 py-4 text-center"><button class="view-ticket-btn text-red-500 hover:underline text-sm font-semibold">View</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Logs Content -->
+            <div id="content-chat" class="tab-content hidden">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-slate-200 dark:border-gray-700 flex h-[75vh]">
+                    <!-- Left Panel: Conversation List -->
+                    <div class="w-1/3 border-r border-slate-200 dark:border-gray-700 flex flex-col">
+                        <div class="p-4 border-b border-slate-200 dark:border-gray-700"><h3 class="text-lg font-semibold text-slate-800 dark:text-white">Recent Conversations</h3></div>
+                        <div class="flex-1 overflow-y-auto">
+                           <div class="p-4 hover:bg-slate-50 dark:hover:bg-gray-700 cursor-pointer border-b border-slate-200 dark:border-gray-700">
+                                <p class="font-semibold">Abdullah Al-Qahtani</p>
+                                <p class="text-sm text-slate-500 truncate">Thanks for your help!</p>
+                           </div>
+                            <div class="p-4 hover:bg-slate-50 dark:hover:bg-gray-700 cursor-pointer border-b border-slate-200 dark:border-gray-700">
+                                <p class="font-semibold">Fatima Al-Mutairi</p>
+                                <p class="text-sm text-slate-500 truncate">I have another question about...</p>
+                           </div>
+                        </div>
+                    </div>
+                    <!-- Right Panel: Chat Window -->
+                    <div class="w-2/3 flex flex-col">
+                         <div class="p-4 border-b border-slate-200 dark:border-gray-700">
+                            <h3 class="text-lg font-semibold text-slate-800 dark:text-white">Abdullah Al-Qahtani</h3>
+                            <p class="text-sm text-green-500">Online</p>
+                         </div>
+                         <div class="flex-1 p-6 space-y-4 overflow-y-auto">
+                            <!-- Agent Message -->
+                            <div class="flex justify-start"><div class="bg-slate-200 dark:bg-gray-700 p-3 rounded-lg max-w-md"><p class="text-sm">Hello Mr. Al-Qahtani, how can I help you today?</p></div></div>
+                            <!-- Customer Message -->
+                            <div class="flex justify-end"><div class="bg-red-500 text-white p-3 rounded-lg max-w-md"><p class="text-sm">Hello, I have a question about my last invoice.</p></div></div>
+                         </div>
+                         <div class="p-4 border-t border-slate-200 dark:border-gray-700">
+                             <input type="text" placeholder="Type a message..." class="w-full bg-slate-100 dark:bg-gray-700 border border-slate-300 dark:border-gray-600 rounded-lg px-4 py-2">
+                         </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SLA Monitoring Content -->
+            <div id="content-sla" class="tab-content hidden space-y-8">
+                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-slate-200 dark:border-gray-700">
+                         <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Ticket Resolution Time (Hours)</h3>
+                         <div class="h-80"><canvas id="resolutionTimeChart"></canvas></div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-slate-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Tickets by Channel</h3>
+                        <div class="h-80"><canvas id="ticketsByChannelChart"></canvas></div>
+                    </div>
+                 </div>
+            </div>
+
+        </main>
+    </div>
+    
+    <!-- Modals -->
+    <div id="generic-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
+        <div class="modal-backdrop fixed inset-0 bg-black/50"></div>
+        <div id="modal-content" class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md m-4 z-10">
+            <div class="flex justify-between items-center p-5 border-b border-slate-200 dark:border-gray-700">
+                <h3 id="modal-title" class="text-xl font-semibold text-slate-900 dark:text-white">Modal Title</h3>
+                <button class="modal-close-btn text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div id="modal-body" class="p-6"></div>
+            <div class="flex justify-end items-center p-4 bg-slate-50 dark:bg-gray-800/50 rounded-b-lg">
+                <button class="modal-close-btn bg-white dark:bg-gray-700 py-2 px-4 border border-slate-300 dark:border-gray-600 rounded-md text-sm font-medium">Close</button>
+                <button id="modal-action-btn" class="ml-3 py-2 px-4 rounded-md text-white bg-red-600 hover:bg-red-700">Action</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Tab Switching Logic ---
+            const tabs = document.querySelectorAll('.tab-link');
+            const contents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = tab.id.replace('tab-', 'content-');
+                    tabs.forEach(t => { t.classList.remove('border-red-500', 'text-red-600', 'dark:text-red-400'); t.classList.add('border-transparent', 'text-slate-500'); });
+                    tab.classList.add('border-red-500', 'text-red-600', 'dark:text-red-400');
+                    contents.forEach(content => { content.classList.toggle('hidden', content.id !== targetId); });
+                });
+            });
+
+            // --- Modal Handling ---
+            const genericModal = document.getElementById('generic-modal');
+            const modalContent = document.getElementById('modal-content');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const modalActionBtn = document.getElementById('modal-action-btn');
+            let currentModalAction = null;
+
+            const openModal = (title, content, actionText, actionCallback, size = 'lg') => {
+                modalTitle.textContent = title;
+                modalBody.innerHTML = content;
+                modalActionBtn.textContent = actionText;
+                currentModalAction = actionCallback;
+                modalContent.classList.remove('max-w-md', 'max-w-4xl');
+                modalContent.classList.add(size === 'lg' ? 'max-w-4xl' : 'max-w-md');
+                genericModal.classList.remove('hidden');
+                genericModal.classList.add('flex');
+            };
+
+            const closeModal = () => {
+                genericModal.classList.add('hidden');
+                genericModal.classList.remove('flex');
+                currentModalAction = null;
+            };
+            
+            genericModal.addEventListener('click', e => { if (e.target.classList.contains('modal-backdrop') || e.target.closest('.modal-close-btn')) closeModal(); });
+            modalActionBtn.addEventListener('click', () => { if (currentModalAction) currentModalAction(); });
+
+            // --- Ticketing System Functionality ---
+            document.getElementById('create-ticket-btn').addEventListener('click', () => {
+                const content = `<form class="space-y-4">
+                    <div><label class="block text-sm font-medium">Customer</label><input type="text" class="mt-1 w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700"></div>
+                    <div><label class="block text-sm font-medium">Subject</label><input type="text" class="mt-1 w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700"></div>
+                    <div><label class="block text-sm font-medium">Description</label><textarea rows="4" class="mt-1 w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700"></textarea></div>
+                </form>`;
+                openModal('Create New Ticket', content, 'Create Ticket', () => { alert('Ticket created!'); closeModal(); }, 'lg');
+            });
+            
+            document.querySelectorAll('.view-ticket-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const content = `<div>... ticket details and history ...</div><textarea placeholder="Type your reply..." class="mt-4 w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700"></textarea>`;
+                    openModal('View Ticket #78901', content, 'Post Reply', () => { alert('Reply posted!'); closeModal(); }, 'lg');
+                });
+            });
+
+            // --- Chart.js Initializations for SLA Monitoring ---
+            const isDarkMode = () => document.documentElement.classList.contains('dark');
+            const getChartColors = () => ({
+                textColor: isDarkMode() ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)',
+                gridColor: isDarkMode() ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+            });
+            
+            let resolutionTimeChart, ticketsByChannelChart;
+
+            const initCharts = () => {
+                const colors = getChartColors();
+                
+                const ctxResolution = document.getElementById('resolutionTimeChart').getContext('2d');
+                resolutionTimeChart = new Chart(ctxResolution, {
+                    type: 'line',
+                    data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], datasets: [{ label: 'Avg. Hours', data: [4.1, 3.8, 5.2, 3.5, 4.0], borderColor: '#ef4444', tension: 0.1 }] },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { color: colors.textColor }, grid: { color: colors.gridColor }}, x: { ticks: { color: colors.textColor }, grid: { color: colors.gridColor }} }, plugins: { legend: { labels: { color: colors.textColor } } } }
+                });
+
+                const ctxChannel = document.getElementById('ticketsByChannelChart').getContext('2d');
+                ticketsByChannelChart = new Chart(ctxChannel, {
+                    type: 'doughnut',
+                    data: { labels: ['Email', 'Phone', 'Chat'], datasets: [{ data: [120, 85, 45], backgroundColor: ['#3b82f6', '#10b981', '#f59e0b'] }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { color: colors.textColor } } } }
+                });
+            };
+            
+            const updateChartColors = () => {
+                const newColors = getChartColors();
+                [resolutionTimeChart, ticketsByChannelChart].forEach(chart => {
+                    if (chart.options.scales) {
+                        chart.options.scales.y.ticks.color = newColors.textColor;
+                        chart.options.scales.x.ticks.color = newColors.textColor;
+                        chart.options.scales.y.grid.color = newColors.gridColor;
+                        chart.options.scales.x.grid.color = newColors.gridColor;
+                    }
+                    if (chart.options.plugins && chart.options.plugins.legend) {
+                        chart.options.plugins.legend.labels.color = newColors.textColor;
+                    }
+                    chart.update();
+                });
+            };
+
+            initCharts();
+        });
+    </script>
+    <%- include('partials_ad/scripts_ad') %>
+</body>
+</html>
+

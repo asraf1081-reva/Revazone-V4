@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meter Management | Reva Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        .modal-backdrop { background-color: rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-gray-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
+    <div class="flex">
+
+        <%- include('partials_ad/sidebar_ad') %>
+
+        <main class="flex-1 h-screen overflow-y-auto p-6 md:p-8">
+            <header class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Meter Management (Operations)</h1>
+                    <p class="text-slate-500 dark:text-slate-400 mt-1">Manage the physical and digital lifecycle of water meters.</p>
+                </div>
+                 <div class="flex items-center gap-4">
+                    <button id="bulk-import-btn" class="bg-slate-200 dark:bg-gray-700 text-slate-700 dark:text-slate-200 font-semibold px-4 py-2 rounded-lg hover:bg-slate-300 dark:hover:bg-gray-600 flex items-center gap-2 whitespace-nowrap">
+                        <i class="fas fa-file-csv"></i>
+                        <span>Bulk Import</span>
+                    </button>
+                    <button id="provision-meter-btn" class="bg-red-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2 whitespace-nowrap">
+                        <i class="fas fa-plus"></i>
+                        <span>Provision New Meter</span>
+                    </button>
+                    <div class="relative" id="user-dropdown">
+                        <button id="dropdown-toggle" class="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">
+                            <span class="font-semibold text-sm"><%= user.name %></span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="dropdown-menu" class="absolute hidden right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl z-10 border border-slate-200 dark:border-slate-700 py-1">
+                            <a href="/logout" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                    <button id="theme-toggle" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                 </div>
+            </header>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow border border-slate-200 dark:border-gray-700 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Total Meters</p>
+                        <p class="text-3xl font-bold mt-1 text-slate-900 dark:text-white">1,024</p>
+                    </div>
+                    <i class="fas fa-tachometer-alt text-3xl text-slate-400"></i>
+                </div>
+                 <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow border border-slate-200 dark:border-gray-700 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Online Meters</p>
+                        <p class="text-3xl font-bold mt-1 text-green-500">986</p>
+                    </div>
+                    <i class="fas fa-wifi text-3xl text-green-500"></i>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow border border-slate-200 dark:border-gray-700 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Offline Meters</p>
+                        <p class="text-3xl font-bold mt-1 text-red-500">38</p>
+                    </div>
+                     <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow border border-slate-200 dark:border-gray-700 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Low Battery Alerts</p>
+                        <p class="text-3xl font-bold mt-1 text-yellow-500">12</p>
+                    </div>
+                     <i class="fas fa-battery-quarter text-3xl text-yellow-500"></i>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-x-auto border border-slate-200 dark:border-gray-700">
+                <table class="min-w-full">
+                    <thead class="bg-slate-50 dark:bg-gray-700/50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Meter ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Assigned Customer</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Last Read</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Signal (LTE)</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Battery</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-gray-700">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">NWC-589745</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-white">Abdullah Al-Qahtani</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">2 Oct 2025, 3:30 PM</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600"><i class="fas fa-signal mr-2"></i>-85 dBm</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600"><i class="fas fa-battery-full mr-2"></i>98%</td>
+                            <td class="px-6 py-4 whitespace-nowrap"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Online</span></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"><a href="#" class="text-red-500 hover:underline manage-meter-btn">Manage</a></td>
+                        </tr>
+                         <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">NWC-365897</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-white">Fatima Al-Mutairi</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">2 Oct 2025, 3:28 PM</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-600"><i class="fas fa-signal mr-2"></i>-95 dBm</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600"><i class="fas fa-battery-full mr-2"></i>92%</td>
+                            <td class="px-6 py-4 whitespace-nowrap"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Online</span></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"><a href="#" class="text-red-500 hover:underline manage-meter-btn">Manage</a></td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">NWC-124578</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-white">Khalid Al-Ghamdi</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">1 Oct 2025, 8:15 AM</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600"><i class="fas fa-signal mr-2"></i>-112 dBm</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-600"><i class="fas fa-battery-half mr-2"></i>45%</td>
+                            <td class="px-6 py-4 whitespace-nowrap"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">Offline</span></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium"><a href="#" class="text-red-500 hover:underline manage-meter-btn">Manage</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div id="provision-meter-modal" class="fixed inset-0 z-50 hidden items-center justify-center overflow-y-auto">
+        <div class="modal-backdrop fixed inset-0"></div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl m-4 z-10 flex flex-col">
+            <div class="flex justify-between items-center p-5 border-b border-slate-200 dark:border-gray-700">
+                <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Provision New Smart Meter</h3>
+                <button id="close-provision-modal-btn" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label for="meter-serial" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Meter Serial Number</label>
+                    <input type="text" id="meter-serial" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white dark:bg-gray-700 sm:text-sm">
+                </div>
+                <div>
+                    <label for="meter-model" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Meter Model</label>
+                    <input type="text" id="meter-model" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white dark:bg-gray-700 sm:text-sm">
+                </div>
+                <div>
+                    <button type="button" id="generate-command-btn" class="w-full text-sm font-semibold text-red-600 dark:text-red-400 hover:underline flex items-center justify-center gap-2">
+                        Generate Provisioning Command ✨
+                    </button>
+                </div>
+                <div id="command-output-container" class="hidden">
+                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Generated Command</label>
+                     <div class="relative mt-1">
+                        <pre id="command-output" class="w-full text-sm p-3 bg-slate-100 dark:bg-gray-900 rounded-md overflow-x-auto font-mono"></pre>
+                        <div id="command-loader" class="absolute inset-0 bg-white/50 dark:bg-gray-800/50 hidden items-center justify-center rounded-md">
+                            <div class="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                     </div>
+                </div>
+            </div>
+            <div class="flex justify-end items-center p-5 border-t border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/50 rounded-b-lg">
+                <button id="cancel-provision-modal-btn" type="button" class="bg-white dark:bg-gray-700 py-2 px-4 border border-slate-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-gray-600">Cancel</button>
+                <button type="button" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Register & Activate</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="bulk-import-modal" class="fixed inset-0 z-50 hidden items-center justify-center overflow-y-auto">
+        <div class="modal-backdrop fixed inset-0"></div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl m-4 z-10 flex flex-col">
+            <div class="flex justify-between items-center p-5 border-b border-slate-200 dark:border-gray-700">
+                <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Bulk Import Meters</h3>
+                <button id="close-bulk-modal-btn" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 dark:border-gray-600 border-dashed rounded-md">
+                    <div class="space-y-1 text-center">
+                        <i class="fas fa-file-csv text-4xl text-slate-400"></i>
+                        <div class="flex text-sm text-slate-600 dark:text-slate-400"><label for="file-upload" class="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-red-600 hover:text-red-500 focus-within:outline-none"><span>Upload a CSV file</span><input id="file-upload" name="file-upload" type="file" class="sr-only"></label>
+                            <p class="pl-1">or drag and drop</p>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-500">Must include columns: meter_serial, meter_model</p>
+                    </div>
+                </div>
+                 <div>
+                    <button type="button" id="generate-csv-btn" class="w-full text-sm font-semibold text-red-600 dark:text-red-400 hover:underline flex items-center justify-center gap-2">
+                        Generate Sample CSV ✨
+                    </button>
+                </div>
+                 <div id="csv-output-container" class="hidden">
+                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Sample CSV Data</label>
+                     <div class="relative mt-1">
+                        <pre id="csv-output" class="w-full text-sm p-3 bg-slate-100 dark:bg-gray-900 rounded-md overflow-x-auto font-mono"></pre>
+                        <div id="csv-loader" class="absolute inset-0 bg-white/50 dark:bg-gray-800/50 hidden items-center justify-center rounded-md">
+                            <div class="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                     </div>
+                </div>
+            </div>
+            <div class="flex justify-end items-center p-5 border-t border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/50 rounded-b-lg">
+                <button id="cancel-bulk-modal-btn" class="bg-white dark:bg-gray-700 py-2 px-4 border border-slate-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-gray-600">Cancel</button>
+                <button type="button" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Import Meters</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+             // --- Gemini API Call Function ---
+            async function callGeminiAPI(prompt) {
+                const apiKey = ""; // Keep this empty
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const payload = { contents: [{ parts: [{ text: prompt }] }], };
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
+                    const result = await response.json();
+                    return result.candidates[0].content.parts[0].text;
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    return "Error generating content.";
+                }
+            }
+
+            // --- ✨ Gemini Feature: Generate Provisioning Command ---
+            const genCommandBtn = document.getElementById('generate-command-btn');
+            const commandOutputContainer = document.getElementById('command-output-container');
+            const commandOutput = document.getElementById('command-output');
+            const commandLoader = document.getElementById('command-loader');
+            genCommandBtn.addEventListener('click', async () => {
+                const serial = document.getElementById('meter-serial').value;
+                const model = document.getElementById('meter-model').value;
+                if (!serial || !model) {
+                    alert('Please enter a serial number and model first.');
+                    return;
+                }
+                
+                commandOutputContainer.classList.remove('hidden');
+                commandLoader.classList.remove('hidden');
+                commandLoader.classList.add('flex');
+                commandOutput.textContent = '';
+                genCommandBtn.disabled = true;
+
+                const prompt = `Generate a JSON object for provisioning a new water meter on an IoT platform. The JSON should include: serialNumber: "${serial}", model: "${model}", activationStatus: "pending", and a timestamp for "provisionDate".`;
+                
+                const result = await callGeminiAPI(prompt);
+                commandOutput.textContent = result;
+
+                commandLoader.classList.add('hidden');
+                commandLoader.classList.remove('flex');
+                genCommandBtn.disabled = false;
+            });
+
+            // --- ✨ Gemini Feature: Generate Sample CSV ---
+            const genCsvBtn = document.getElementById('generate-csv-btn');
+            const csvOutputContainer = document.getElementById('csv-output-container');
+            const csvOutput = document.getElementById('csv-output');
+            const csvLoader = document.getElementById('csv-loader');
+            genCsvBtn.addEventListener('click', async () => {
+                csvOutputContainer.classList.remove('hidden');
+                csvLoader.classList.remove('hidden');
+                csvLoader.classList.add('flex');
+                csvOutput.textContent = '';
+                genCsvBtn.disabled = true;
+
+                const prompt = `Generate a sample CSV content with a header row and 3 rows of fake data for bulk importing water meters in Saudi Arabia. The columns should be "meter_serial" and "meter_model". Use realistic NWC format for serials.`;
+                
+                const result = await callGeminiAPI(prompt);
+                csvOutput.textContent = result;
+                
+                csvLoader.classList.add('hidden');
+                csvLoader.classList.remove('flex');
+                genCsvBtn.disabled = false;
+            });
+
+            // --- Modal Logic ---
+            function setupModal(modalId, openBtnId, closeBtnId, cancelBtnId) {
+                const modal = document.getElementById(modalId);
+                const openBtn = document.getElementById(openBtnId);
+                const closeBtn = document.getElementById(closeBtnId);
+                const cancelBtn = document.getElementById(cancelBtnId);
+                const backdrop = modal.querySelector('.modal-backdrop');
+
+                const open = () => { modal.classList.remove('hidden'); modal.classList.add('flex'); };
+                const close = () => { modal.classList.add('hidden'); modal.classList.remove('flex'); };
+
+                openBtn.addEventListener('click', open);
+                closeBtn.addEventListener('click', close);
+                cancelBtn.addEventListener('click', close);
+                backdrop.addEventListener('click', close);
+            }
+
+            setupModal('provision-meter-modal', 'provision-meter-btn', 'close-provision-modal-btn', 'cancel-provision-modal-btn');
+            setupModal('bulk-import-modal', 'bulk-import-btn', 'close-bulk-modal-btn', 'cancel-bulk-modal-btn');
+            
+            // NOTE: The dropdown and theme-toggle JS is likely in 'partials_ad/scripts_ad', 
+            // which is correctly included. No changes needed here for that functionality.
+        });
+    </script>
+    <%- include('partials_ad/scripts_ad') %>
+</body>
+</html>

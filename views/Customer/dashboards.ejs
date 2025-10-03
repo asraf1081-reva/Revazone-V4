@@ -20,7 +20,13 @@
 
     <style> 
         body { font-family: 'Inter', sans-serif; }
-        /* The old .leaflet-pane filter has been REMOVED for a better look */
+        /* UPDATED: Added styles for map popups */
+        .leaflet-popup-content-wrapper { background-color: #f9fafb; color: #1f2937; border-radius: 0.5rem; }
+        .dark .leaflet-popup-content-wrapper { background-color: #1f2937; color: #d1d5db; }
+        .leaflet-popup-tip { background-color: #f9fafb; }
+        .dark .leaflet-popup-tip { background-color: #1f2937; }
+        .leaflet-popup-content h3 { font-weight: bold; color: #C0392B; }
+        .leaflet-popup-content p { margin: 4px 0; }
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300">
@@ -31,7 +37,7 @@
         <main class="flex-1 h-screen overflow-y-auto p-6 md:p-8">
             <header class="flex justify-between items-center mb-8">
                  <div>
-                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Water Consumption Dashboard</h1>
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Riyadh Water Consumption Dashboard</h1>
                     <p class="text-slate-500 dark:text-slate-400 mt-1">An overview of water meter data and performance.</p>
                 </div>
                 <div class="flex items-center gap-4">
@@ -164,7 +170,7 @@
 
             const lightTiles = 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png';
             const darkTiles = 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png';
-            const stadiaAttribution = '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>';
+            const stadiaAttribution = '&copy; Stadia Maps, &copy; OpenMapTiles &copy; OpenStreetMap';
 
             const updateMapTheme = () => {
                 const isDark = document.documentElement.classList.contains('dark');
@@ -182,11 +188,32 @@
                 'Government Building': { icon: 'landmark', color: 'purple' },
                 'default': { icon: 'question-circle', color: 'gray' }
             };
+
+            // NEW: Helper function to generate status badges, copied from usage-details
+            const getStatusBadgeHTML = (status) => {
+                let statusClass = 'bg-yellow-100 text-yellow-800';
+                if (status === 'Active') statusClass = 'bg-green-100 text-green-800';
+                if (status === 'Inactive') statusClass = 'bg-slate-200 text-slate-800';
+                return `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${status}</span>`;
+            };
             
             mapData.forEach(meter => {
                 const iconDetails = iconMappings[meter.buildingType] || iconMappings.default;
                 const markerIcon = L.AwesomeMarkers.icon({ icon: iconDetails.icon, prefix: 'fa', markerColor: iconDetails.color });
-                L.marker([meter.lat, meter.lng], { icon: markerIcon }).addTo(map).bindPopup(`<b>${meter.id}</b><br>${meter.location}`);
+                
+                // UPDATED: Create detailed popup content
+                const popupContent = `
+                    <h3>${meter.id}</h3>
+                    <p><strong>Building:</strong> ${meter.buildingType}</p>
+                    <p><strong>Status:</strong> ${getStatusBadgeHTML(meter.status)}</p>
+                    <p><strong>Location:</strong> ${meter.location}</p>
+                    <hr style="margin: 4px 0;">
+                    <p><strong>Last Reading:</strong> ${meter.lastReading}</p>
+                    <p><strong>Total Readings:</strong> ${meter.totalReadings}</p>
+                    <p><strong>Amount:</strong> ${meter.amount}</p>
+                `;
+                
+                L.marker([meter.lat, meter.lng], { icon: markerIcon }).addTo(map).bindPopup(popupContent);
             });
             
             // --- CHARTS ---
