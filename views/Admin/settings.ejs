@@ -23,7 +23,6 @@
         <%- include('partials_ad/sidebar_ad') %>
 
         <main class="flex-1 h-screen overflow-y-auto p-6 md:p-8">
-            <!-- Header -->
             <header class="flex justify-between items-center mb-8">
                 <div>
                     <h1 class="text-3xl font-bold text-slate-900 dark:text-white">System Administration</h1>
@@ -31,40 +30,35 @@
                 </div>
                  <div class="flex items-center gap-4">
                     <div class="relative" id="user-dropdown">
-                        <button id="dropdown-toggle" class="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">
+                         <button id="dropdown-toggle" class="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">
                             <span class="font-semibold text-sm"><%= user.name %></span>
                             <i class="fas fa-chevron-down text-xs"></i>
-                        </button>
+                         </button>
                         <div id="dropdown-menu" class="absolute hidden right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl z-20 border border-slate-200 dark:border-slate-700 py-1">
                             <a href="/logout" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
                                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                                 <span>Logout</span>
                             </a>
-                        </div>
+                         </div>
                     </div>
                     <button id="theme-toggle" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">
                         <i class="fas fa-moon"></i>
-                    </button>
+                     </button>
                 </div>
             </header>
             
-            <!-- Tabs Navigation -->
             <div class="mb-6">
                 <div class="border-b border-slate-200 dark:border-gray-700">
-                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                     <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                         <a href="#" id="tab-settings" class="tab-link border-red-500 text-red-600 dark:text-red-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">System Settings</a>
                         <a href="#" id="tab-roles" class="tab-link border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-gray-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">User Roles & Permissions</a>
-                        <a href="#" id="tab-tools" class="tab-link border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-gray-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">Operations Tools</a>
                     </nav>
                 </div>
             </div>
 
-            <!-- System Settings Content -->
             <div id="content-settings" class="tab-content space-y-8">
                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Column 1: Localization & Branding -->
                     <div class="space-y-8">
-                        <!-- Localization -->
                         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-slate-200 dark:border-gray-700">
                              <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Localization</h3>
                              <form class="space-y-4">
@@ -80,18 +74,17 @@
                                          <label for="currency" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Currency</label>
                                          <input type="text" id="currency" value="SAR" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
                                      </div>
-                                      <div>
+                                     <div>
                                          <label for="vat" class="block text-sm font-medium text-slate-700 dark:text-slate-300">VAT Rate (%)</label>
                                          <input type="number" id="vat" value="15" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
                                      </div>
                                  </div>
                              </form>
                         </div>
-                        <!-- Branding -->
                         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-slate-200 dark:border-gray-700">
                              <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Branding</h3>
                              <div class="flex items-center gap-6">
-                                 <img id="logo-preview" src="https://placehold.co/100x100/ef4444/white?text=Logo" alt="Company Logo" class="h-20 w-20 rounded-lg object-cover">
+                                <img id="logo-preview" src="https://placehold.co/100x100/ef4444/white?text=Logo" alt="Company Logo" class="h-20 w-20 rounded-lg object-cover">
                                  <div>
                                      <label for="logo-upload" class="cursor-pointer bg-red-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-600 text-sm">
                                          Upload New Logo
@@ -99,58 +92,55 @@
                                      <input type="file" id="logo-upload" class="hidden" accept="image/png, image/jpeg">
                                      <p class="text-xs text-slate-500 mt-2">PNG or JPG, max 2MB.</p>
                                  </div>
-                             </div>
+                            </div>
                              <hr class="my-6 border-slate-200 dark:border-gray-700">
                              <h4 class="font-semibold text-slate-800 dark:text-white mb-2">Templates & Notifications</h4>
-                             <p class="text-sm text-slate-500 dark:text-slate-400">Customize the look of invoices, emails, and alerts.</p>
+                             <p class="text-sm text-slate-500 dark:text-slate-400">Customize the invoices, emails, and alerts.</p>
                              <button id="manage-templates-btn" class="mt-3 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold px-4 py-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 text-sm">
-                                 Manage Templates
+                                Manage Templates
                              </button>
                         </div>
                     </div>
-                    <!-- Column 2: API Integrations -->
+                    
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-slate-200 dark:border-gray-700">
-                         <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">API Integrations</h3>
+                         <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">System Health</h3>
                          <ul class="space-y-4">
+                            <li class="flex items-center justify-between p-3 rounded-md bg-slate-50 dark:bg-gray-700/50">
+                                <div class="flex items-center gap-4">
+                                    <i class="fas fa-database text-2xl text-slate-500"></i>
+                                    <p class="font-semibold">Database Connection</p>
+                                </div>
+                                <div class="flex items-center gap-2 text-sm text-green-600 font-bold"><i class="fas fa-check-circle"></i> Healthy</div>
+                            </li>
                              <li class="flex items-center justify-between p-3 rounded-md bg-slate-50 dark:bg-gray-700/50">
-                                 <div class="flex items-center gap-4">
-                                     <i class="fas fa-credit-card text-2xl text-blue-500"></i>
-                                     <div>
-                                         <p class="font-semibold">Payment Gateway</p>
-                                         <p class="text-xs text-green-600 font-bold">Connected</p>
-                                     </div>
-                                 </div>
-                                 <button class="manage-api-btn text-sm font-semibold text-red-500 hover:underline">Manage</button>
-                             </li>
+                                <div class="flex items-center gap-4">
+                                    <i class="fas fa-cogs text-2xl text-slate-500"></i>
+                                    <p class="font-semibold">Meter API Service</p>
+                                </div>
+                                <div class="flex items-center gap-2 text-sm text-green-600 font-bold"><i class="fas fa-check-circle"></i> Operational</div>
+                            </li>
                              <li class="flex items-center justify-between p-3 rounded-md bg-slate-50 dark:bg-gray-700/50">
-                                 <div class="flex items-center gap-4">
-                                     <i class="fas fa-comment-sms text-2xl text-green-500"></i>
-                                     <div>
-                                         <p class="font-semibold">SMS Gateway</p>
-                                         <p class="text-xs text-green-600 font-bold">Connected</p>
-                                     </div>
-                                 </div>
-                                 <button class="manage-api-btn text-sm font-semibold text-red-500 hover:underline">Manage</button>
-                             </li>
+                                <div class="flex items-center gap-4">
+                                    <i class="fas fa-envelope text-2xl text-slate-500"></i>
+                                    <p class="font-semibold">Mail Server</p>
+                                </div>
+                                <div class="flex items-center gap-2 text-sm text-yellow-600 font-bold"><i class="fas fa-exclamation-triangle"></i> Degraded Performance</div>
+                            </li>
                              <li class="flex items-center justify-between p-3 rounded-md bg-slate-50 dark:bg-gray-700/50">
-                                 <div class="flex items-center gap-4">
-                                     <i class="fas fa-envelope text-2xl text-slate-500"></i>
-                                     <div>
-                                         <p class="font-semibold">Email Service</p>
-                                         <p class="text-xs text-slate-500">Not Configured</p>
-                                     </div>
-                                 </div>
-                                 <button class="manage-api-btn text-sm font-semibold text-red-500 hover:underline">Configure</button>
-                             </li>
+                                <div class="flex items-center gap-4">
+                                    <i class="fas fa-history text-2xl text-slate-500"></i>
+                                    <p class="font-semibold">Background Jobs</p>
+                                </div>
+                                 <div class="flex items-center gap-2 text-sm text-green-600 font-bold"><i class="fas fa-check-circle"></i> Running</div>
+                            </li>
                          </ul>
                     </div>
                 </div>
                  <div class="flex justify-end">
-                    <button id="save-settings-btn" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700">Save Settings</button>
+                     <button id="save-settings-btn" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700">Save Settings</button>
                 </div>
             </div>
 
-            <!-- User Roles & Permissions Content (Table Style) -->
             <div id="content-roles" class="tab-content hidden">
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-slate-200 dark:border-gray-700">
                     <div class="p-4 border-b border-slate-200 dark:border-gray-700 flex justify-between items-center">
@@ -162,77 +152,13 @@
                             <thead class="bg-slate-50 dark:bg-gray-700/50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Login</th>
+                                     <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Login</th>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
                                 </tr>
                             </thead>
                             <tbody id="user-list-tbody" class="divide-y divide-slate-200 dark:divide-gray-700">
-                                <!-- User rows will be injected by JS -->
-                            </tbody>
+                                </tbody>
                         </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Operations Tools Content -->
-            <div id="content-tools" class="tab-content hidden space-y-8">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                     <!-- Bulk Data & Data Correction -->
-                    <div class="space-y-8">
-                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-slate-200 dark:border-gray-700">
-                             <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Bulk Data Uploads</h3>
-                             <select class="mb-4 w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
-                                <option>Select data type to upload...</option>
-                                <option>New Meter Registrations</option>
-                                <option>Customer Information Updates</option>
-                             </select>
-                             <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 dark:border-gray-600 border-dashed rounded-md">
-                                 <div class="space-y-1 text-center">
-                                     <i class="fas fa-file-csv text-4xl text-slate-400"></i>
-                                     <div class="flex text-sm text-slate-600 dark:text-slate-400">
-                                         <label for="bulk-upload" class="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-red-600 hover:text-red-500"><span>Upload a file</span><input type="file" id="bulk-upload" class="sr-only"></label>
-                                         <p class="pl-1">or drag and drop</p>
-                                     </div>
-                                     <p id="bulk-upload-filename" class="text-xs text-slate-500">No file selected</p>
-                                 </div>
-                             </div>
-                        </div>
-                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-slate-200 dark:border-gray-700">
-                             <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">Data Correction Tool</h3>
-                             <form class="space-y-4" id="data-correction-form">
-                                <div>
-                                    <label for="record-id" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Record ID (e.g., Meter or Customer ID)</label>
-                                    <input type="text" id="record-id" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm" placeholder="SA-CUST-001">
-                                </div>
-                                <button type="submit" class="bg-red-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-600 text-sm">Fetch Record</button>
-                             </form>
-                             <div id="fetched-record-container" class="mt-4 hidden">
-                                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Fetched Record Data (JSON)</label>
-                                 <textarea id="fetched-record-data" rows="6" class="mt-1 font-mono text-xs block w-full rounded-md border-slate-300 dark:border-gray-600 bg-slate-50 dark:bg-gray-900 sm:text-sm"></textarea>
-                             </div>
-                        </div>
-                    </div>
-                     <!-- System Diagnostics -->
-                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-slate-200 dark:border-gray-700">
-                         <h3 class="text-lg font-semibold text-slate-800 dark:text-white mb-4">System Diagnostics</h3>
-                         <ul class="space-y-4">
-                            <li class="flex items-center justify-between p-3 rounded-md bg-slate-50 dark:bg-gray-700/50">
-                                <p class="font-semibold">Database Connection</p>
-                                <div class="flex items-center gap-2 text-sm text-green-600 font-bold"><i class="fas fa-check-circle"></i> Healthy</div>
-                            </li>
-                             <li class="flex items-center justify-between p-3 rounded-md bg-slate-50 dark:bg-gray-700/50">
-                                <p class="font-semibold">API Services</p>
-                                <div class="flex items-center gap-2 text-sm text-green-600 font-bold"><i class="fas fa-check-circle"></i> Operational</div>
-                            </li>
-                             <li class="flex items-center justify-between p-3 rounded-md bg-slate-50 dark:bg-gray-700/50">
-                                <p class="font-semibold">Mail Server</p>
-                                <div class="flex items-center gap-2 text-sm text-yellow-600 font-bold"><i class="fas fa-exclamation-triangle"></i> Degraded Performance</div>
-                            </li>
-                             <li class="flex items-center justify-between p-3 rounded-md bg-slate-50 dark:bg-gray-700/50">
-                                <p class="font-semibold">Background Jobs</p>
-                                 <div class="flex items-center gap-2 text-sm text-green-600 font-bold"><i class="fas fa-check-circle"></i> Running</div>
-                            </li>
-                         </ul>
                     </div>
                 </div>
             </div>
@@ -240,7 +166,6 @@
         </main>
     </div>
 
-    <!-- Generic Modal -->
     <div id="generic-modal" class="fixed inset-0 z-50 hidden items-center justify-center">
         <div class="modal-backdrop fixed inset-0 bg-black/50"></div>
         <div id="modal-content" class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md m-4 z-10">
@@ -249,8 +174,7 @@
                 <button class="modal-close-btn text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fas fa-times text-xl"></i></button>
             </div>
             <div id="modal-body" class="p-6">
-                <!-- Modal content goes here -->
-            </div>
+                </div>
             <div class="flex justify-end items-center p-4 bg-slate-50 dark:bg-gray-800/50 rounded-b-lg">
                 <button class="modal-close-btn bg-white dark:bg-gray-700 py-2 px-4 border border-slate-300 dark:border-gray-600 rounded-md text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-gray-600">Close</button>
                 <button id="modal-action-btn" class="ml-3 py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Action</button>
@@ -258,7 +182,7 @@
         </div>
     </div>
     
-    <script>
+     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- Main Tab Switching Logic ---
             const tabs = document.querySelectorAll('.tab-link');
@@ -284,7 +208,6 @@
             const modalBody = document.getElementById('modal-body');
             const modalActionBtn = document.getElementById('modal-action-btn');
             let currentModalAction = null;
-
             const openModal = (title, content, actionText, actionCallback, size = 'md') => {
                 modalTitle.textContent = title;
                 modalBody.innerHTML = content;
@@ -301,7 +224,6 @@
                 genericModal.classList.remove('hidden');
                 genericModal.classList.add('flex');
             };
-
             const closeModal = () => {
                 genericModal.classList.add('hidden');
                 genericModal.classList.remove('flex');
@@ -313,13 +235,12 @@
                     closeModal();
                 }
             });
-            
             modalActionBtn.addEventListener('click', () => {
                 if (currentModalAction) {
                     currentModalAction();
                 }
             });
-
+            
             // --- System Settings Functionality ---
             document.getElementById('save-settings-btn').addEventListener('click', (e) => {
                 const btn = e.target;
@@ -344,39 +265,16 @@
                     reader.readAsDataURL(logoUploadInput.files[0]);
                 }
             });
-            
             document.getElementById('manage-templates-btn').addEventListener('click', () => {
                 openModal('Manage Templates', '<p>This is where you would edit email, invoice, and notification templates.</p>', 'Save Changes', () => { alert('Template changes saved!'); closeModal(); });
             });
 
-            document.querySelectorAll('.manage-api-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    openModal('Manage API Integration', '<p>API Key management and configuration settings would appear here.</p>', 'Save API Key', () => { alert('API Key saved!'); closeModal(); });
-                });
-            });
-
             // --- User Roles & Permissions Functionality ---
             let users = {
-                'user1': { 
-                    name: 'Abdullah Al-Qahtani', 
-                    email: 'admin@reva.com', 
-                    status: 'Confirmed',
-                    permissions: { billing_access: 'manager', 'perm-apply-discounts': true, customer_access: 'user', meter_access: 'user', analytics_access: 'viewer', dashboard_access: 'viewer', admin_access: 'admin' }
-                },
-                'user2': { 
-                    name: 'Fatima Al-Mutairi', 
-                    email: 'finance@reva.com', 
-                    status: 'Confirmed',
-                    permissions: { billing_access: 'user', 'perm-apply-discounts': true, customer_access: 'viewer', meter_access: 'viewer', analytics_access: 'viewer', dashboard_access: 'viewer', admin_access: 'none' }
-                },
-                'user3': {
-                    name: 'Omar Al-Harbi',
-                    email: 'operator@reva.com',
-                    status: 'Pending',
-                    permissions: { billing_access: 'viewer', 'perm-apply-discounts': false, customer_access: 'user', meter_access: 'user', analytics_access: 'none', dashboard_access: 'viewer', admin_access: 'none' }
-                }
+                'user1': { name: 'Abdullah Al-Qahtani', email: 'admin@reva.com', status: 'Confirmed', permissions: { billing_access: 'manager', 'perm-apply-discounts': true, customer_access: 'user', meter_access: 'user', analytics_access: 'viewer', dashboard_access: 'viewer', admin_access: 'admin' }},
+                'user2': { name: 'Fatima Al-Mutairi', email: 'finance@reva.com', status: 'Confirmed', permissions: { billing_access: 'user', 'perm-apply-discounts': true, customer_access: 'viewer', meter_access: 'viewer', analytics_access: 'viewer', dashboard_access: 'viewer', admin_access: 'none' }},
+                'user3': { name: 'Omar Al-Harbi', email: 'operator@reva.com', status: 'Pending', permissions: { billing_access: 'viewer', 'perm-apply-discounts': false, customer_access: 'user', meter_access: 'user', analytics_access: 'none', dashboard_access: 'viewer', admin_access: 'none' }}
             };
-
             const userListTbody = document.getElementById('user-list-tbody');
             let activeUserId = null;
 
@@ -412,8 +310,8 @@
                     userListTbody.appendChild(userRow);
                 }
             };
-            
-             const createPermissionsFormHTML = (user) => {
+
+            const createPermissionsFormHTML = (user) => {
                 const p = user.permissions;
                 const isChecked = (group, value) => p[group] === value ? 'checked' : '';
                 const isCheckedBox = (perm) => p[perm] ? 'checked' : '';
@@ -434,33 +332,27 @@
                             </div>
                         </div>
                         <hr class="border-slate-200 dark:border-gray-700">
-                         <!-- Billing Module -->
                         <div>
                             <h4 class="font-semibold text-slate-800 dark:text-slate-200 mb-2">Billing & Invoicing</h4>
                             <div class="space-y-2"><label class="flex items-center"><input type="radio" name="billing_access" value="none" ${isChecked('billing_access', 'none')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">No Access</span></label><label class="flex items-center"><input type="radio" name="billing_access" value="viewer" ${isChecked('billing_access', 'viewer')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">View Only</span></label><label class="flex items-center"><input type="radio" name="billing_access" value="user" ${isChecked('billing_access', 'user')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">User</span></label><label class="flex items-center"><input type="radio" name="billing_access" value="manager" ${isChecked('billing_access', 'manager')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">Manager</span></label></div>
                             <div class="pl-6 mt-3 border-l-2 border-slate-200 dark:border-gray-700"><label class="flex items-center"><input type="checkbox" id="perm-apply-discounts" ${isCheckedBox('perm-apply-discounts')} class="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"><span class="ml-2 text-sm">Allow Discounts</span></label></div>
                         </div>
-                        <!-- Customer Management -->
                         <div>
                              <h4 class="font-semibold text-slate-800 dark:text-slate-200 mb-2">Customer Management</h4>
                              <div class="space-y-2"><label class="flex items-center"><input type="radio" name="customer_access" value="none" ${isChecked('customer_access', 'none')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">No Access</span></label><label class="flex items-center"><input type="radio" name="customer_access" value="viewer" ${isChecked('customer_access', 'viewer')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">View Only</span></label><label class="flex items-center"><input type="radio" name="customer_access" value="user" ${isChecked('customer_access', 'user')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">Create & Edit</span></label></div>
                         </div>
-                         <!-- Meter Operations -->
                         <div>
-                            <h4 class="font-semibold text-slate-800 dark:text-slate-200 mb-2">Meter Operations</h4>
+                             <h4 class="font-semibold text-slate-800 dark:text-slate-200 mb-2">Meter Operations</h4>
                             <div class="space-y-2"><label class="flex items-center"><input type="radio" name="meter_access" value="none" ${isChecked('meter_access', 'none')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">No Access</span></label><label class="flex items-center"><input type="radio" name="meter_access" value="viewer" ${isChecked('meter_access', 'viewer')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">View Only</span></label><label class="flex items-center"><input type="radio" name="meter_access" value="user" ${isChecked('meter_access', 'user')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">Operator</span></label></div>
-                        </div>
-                        <!-- Analytics -->
+                         </div>
                         <div>
                              <h4 class="font-semibold text-slate-800 dark:text-slate-200 mb-2">Analytics & Reports</h4>
                              <div class="space-y-2"><label class="flex items-center"><input type="radio" name="analytics_access" value="none" ${isChecked('analytics_access', 'none')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">No Access</span></label><label class="flex items-center"><input type="radio" name="analytics_access" value="viewer" ${isChecked('analytics_access', 'viewer')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">View Access</span></label></div>
                         </div>
-                        <!-- Dashboard -->
                         <div>
                              <h4 class="font-semibold text-slate-800 dark:text-slate-200 mb-2">Dashboard</h4>
-                            <div class="space-y-2"><label class="flex items-center"><input type="radio" name="dashboard_access" value="none" ${isChecked('dashboard_access', 'none')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">No Access</span></label><label class="flex items-center"><input type="radio" name="dashboard_access" value="viewer" ${isChecked('dashboard_access', 'viewer')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">View Access</span></label></div>
+                             <div class="space-y-2"><label class="flex items-center"><input type="radio" name="dashboard_access" value="none" ${isChecked('dashboard_access', 'none')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">No Access</span></label><label class="flex items-center"><input type="radio" name="dashboard_access" value="viewer" ${isChecked('dashboard_access', 'viewer')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">View Access</span></label></div>
                         </div>
-                        <!-- Admin -->
                         <div>
                             <h4 class="font-semibold text-slate-800 dark:text-slate-200 mb-2">Administration</h4>
                             <div class="space-y-2"><label class="flex items-center"><input type="radio" name="admin_access" value="none" ${isChecked('admin_access', 'none')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">No Access</span></label><label class="flex items-center"><input type="radio" name="admin_access" value="admin" ${isChecked('admin_access', 'admin')} class="h-4 w-4 text-red-600 border-gray-300 focus:ring-red-500"><span class="ml-2 text-sm">Administrator</span></label></div>
@@ -473,21 +365,19 @@
                 const userRow = e.target.closest('.user-list-item');
                 if (userRow) {
                     const userId = userRow.dataset.userId;
-                    activeUserId = userId; // Set active user for saving
+                    activeUserId = userId;
                     const user = users[userId];
-
                     const formHTML = createPermissionsFormHTML(user);
                     
                     openModal(`Editing: ${user.name}`, formHTML, 'Save Permissions', () => {
-                        const newPermissions = {};
+                         const newPermissions = {};
                         const formInModal = document.getElementById('permissions-form-modal');
-                        
                         const newPassword = formInModal.querySelector('#new-password').value;
-                        if(newPassword) {
+                         if(newPassword) {
                             alert(`Password changed for ${user.name}.`);
                         }
                         
-                        formInModal.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]').forEach(input => {
+                         formInModal.querySelectorAll('input[type="radio"]:checked, input[type="checkbox"]').forEach(input => {
                              if (input.type === 'radio') {
                                  newPermissions[input.name] = input.value;
                              } else {
@@ -498,8 +388,7 @@
                         alert(`${user.name}'s permissions have been updated.`);
                         closeModal();
                     }, 'lg');
-                    
-                    // Add event listeners for buttons inside the newly created modal content
+
                     const deactivateBtn = document.getElementById('deactivate-user-btn');
                     if (deactivateBtn) {
                         deactivateBtn.addEventListener('click', () => {
@@ -514,16 +403,15 @@
                     if(deleteBtn) {
                         deleteBtn.addEventListener('click', () => {
                             if (confirm(`Are you sure you want to permanently delete ${user.name}? This action cannot be undone.`)) {
-                                delete users[userId];
+                                 delete users[userId];
                                 renderUserList();
                                 alert(`${user.name} has been deleted.`);
-                                closeModal();
+                                 closeModal();
                             }
                         });
                     }
                 }
             });
-            
             document.getElementById('add-user-btn').addEventListener('click', () => {
                 const content = `
                     <div class="space-y-4">
@@ -532,17 +420,16 @@
                             <input type="text" id="new-user-name" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700" required>
                         </div>
                         <div>
-                            <label for="new-user-email" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
+                             <label for="new-user-email" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Email</label>
                             <input type="email" id="new-user-email" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700" required>
                         </div>
-                        <div class="pt-2">
+                         <div class="pt-2">
                             <label class="flex items-center">
                                 <input type="checkbox" id="send-invitation" class="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500" checked>
-                                <span class="ml-2 text-sm text-slate-600 dark:text-slate-300">Send invitation email</span>
+                                 <span class="ml-2 text-sm text-slate-600 dark:text-slate-300">Send invitation email</span>
                             </label>
                         </div>
                     </div>`;
-
                 openModal('Add New User', content, 'Add User', () => {
                     const name = document.getElementById('new-user-name').value;
                     const email = document.getElementById('new-user-email').value;
@@ -550,17 +437,8 @@
                     if (name && email) {
                         const newId = 'user' + (Object.keys(users).length + 1);
                         users[newId] = {
-                            name,
-                            email,
-                            status: 'Pending',
-                            permissions: { 
-                                billing_access: 'none', 'perm-apply-discounts': false, 
-                                customer_access: 'none', 
-                                meter_access: 'none',
-                                analytics_access: 'none',
-                                dashboard_access: 'none',
-                                admin_access: 'none'
-                            }
+                            name, email, status: 'Pending',
+                            permissions: { billing_access: 'none', 'perm-apply-discounts': false, customer_access: 'none', meter_access: 'none', analytics_access: 'none', dashboard_access: 'none', admin_access: 'none' }
                         };
                         renderUserList();
                         if (sendInvitation) {
@@ -574,36 +452,6 @@
             });
 
             renderUserList();
-
-            // --- Operations Tools Functionality ---
-             const bulkUploadInput = document.getElementById('bulk-upload');
-            const bulkUploadFilename = document.getElementById('bulk-upload-filename');
-            bulkUploadInput.addEventListener('change', () => {
-                if (bulkUploadInput.files.length > 0) {
-                    bulkUploadFilename.textContent = bulkUploadInput.files[0].name;
-                } else {
-                    bulkUploadFilename.textContent = 'No file selected';
-                }
-            });
-
-            document.getElementById('data-correction-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const recordId = document.getElementById('record-id').value || 'SA-CUST-001';
-                const fetchedDataContainer = document.getElementById('fetched-record-container');
-                const fetchedDataTextarea = document.getElementById('fetched-record-data');
-                
-                const mockData = {
-                    id: recordId,
-                    name: "Abdullah Al-Qahtani",
-                    email: "abdullah.q@email.com",
-                    meterId: "NWC-589745",
-                    lastReading: 152.3,
-                    status: "Active"
-                };
-
-                fetchedDataTextarea.value = JSON.stringify(mockData, null, 2);
-                fetchedDataContainer.classList.remove('hidden');
-            });
         });
     </script>
         <footer class="fixed bottom-4 right-4 text-xs text-slate-500 dark:text-slate-400">
@@ -613,4 +461,3 @@
     <%- include('partials_ad/scripts_ad') %>
 </body>
 </html>
-

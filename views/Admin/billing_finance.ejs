@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Billing & Finance | Reva Platform</title>
+    <title>Billing & Payments | Reva Platform</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -12,6 +12,10 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style> 
         body { font-family: 'Inter', sans-serif; } 
         .modal-backdrop { background-color: rgba(0,0,0,0.5); }
@@ -25,7 +29,7 @@
         <main class="flex-1 h-screen overflow-y-auto p-6 md:p-8">
             <header class="flex justify-between items-center mb-8">
                 <div>
-                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Billing & Finance</h1>
+                    <h1 class="text-3xl font-bold text-slate-900 dark:text-white">Billing & Payments</h1>
                     <p class="text-slate-500 dark:text-slate-400 mt-1">Manage invoices, tariffs, and payment settlements.</p>
                 </div>
                  <div class="flex items-center gap-4">
@@ -34,7 +38,7 @@
                             <span class="font-semibold text-sm"><%= user.name %></span>
                             <i class="fas fa-chevron-down text-xs"></i>
                         </button>
-                        <div id="dropdown-menu" class="absolute hidden right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl z-10 border border-slate-200 dark:border-slate-700 py-1">
+                        <div id="dropdown-menu" class="absolute hidden right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl z-20 border border-slate-200 dark:border-slate-700 py-1">
                             <a href="/logout" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
                                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                                 <span>Logout</span>
@@ -46,6 +50,45 @@
                     </button>
                 </div>
             </header>
+
+           <section class="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div id="kpi-total" class="kpi-card bg-white dark:bg-gray-800 p-5 rounded-lg shadow border-2 border-red-500 flex items-center gap-5 cursor-pointer">
+                    <div class="p-4 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
+                        <i class="fas fa-file-invoice-dollar text-3xl text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400">Total Amount</h3>
+                        <p class="text-3xl font-bold text-slate-900 dark:text-white mt-1">SAR 240.25</p>
+                    </div>
+                </div>
+                <div id="kpi-settled" class="kpi-card bg-white dark:bg-gray-800 p-5 rounded-lg shadow border-2 border-transparent flex items-center gap-5 cursor-pointer">
+                    <div class="p-4 bg-green-100 dark:bg-green-900/40 rounded-lg">
+                        <i class="fas fa-check-circle text-3xl text-green-600 dark:text-green-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400">Total Settled</h3>
+                        <p class="text-3xl font-bold text-slate-900 dark:text-white mt-1">SAR 85.50</p>
+                    </div>
+                </div>
+                <div id="kpi-due" class="kpi-card bg-white dark:bg-gray-800 p-5 rounded-lg shadow border-2 border-transparent flex items-center gap-5 cursor-pointer">
+                    <div class="p-4 bg-yellow-100 dark:bg-yellow-900/40 rounded-lg">
+                        <i class="fas fa-hourglass-half text-3xl text-yellow-600 dark:text-yellow-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400">Total Due</h3>
+                        <p class="text-3xl font-bold text-slate-900 dark:text-white mt-1">SAR 112.00</p>
+                    </div>
+                </div>
+                <div id="kpi-overdue" class="kpi-card bg-white dark:bg-gray-800 p-5 rounded-lg shadow border-2 border-transparent flex items-center gap-5 cursor-pointer">
+                    <div class="p-4 bg-red-100 dark:bg-red-900/40 rounded-lg">
+                        <i class="fas fa-exclamation-circle text-3xl text-red-600 dark:text-red-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400">Total Overdue</h3>
+                        <p class="text-3xl font-bold text-slate-900 dark:text-white mt-1">SAR 42.75</p>
+                    </div>
+                </div>
+            </section>
 
             <div class="mb-6">
                 <div class="border-b border-slate-200 dark:border-gray-700">
@@ -74,7 +117,6 @@
                         </button>
                     </div>
                 </div>
-
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-x-auto border border-slate-200 dark:border-gray-700">
                     <table class="min-w-full">
                          <thead class="bg-slate-50 dark:bg-gray-700/50">
@@ -88,39 +130,39 @@
                                 <th class="px-6 py-3 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
-                         <tbody class="divide-y divide-slate-200 dark:divide-gray-700">
+                         <tbody id="invoices-table-body" class="divide-y divide-slate-200 dark:divide-gray-700">
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">INV-2025-09-001</td>
+                               <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">52648</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-white">Abdullah Al-Qahtani</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">01 Sep 2025</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">15 Sep 2025</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-800 dark:text-white">SAR 85.50</td>
-                                <td class="px-6 py-4 whitespace-nowrap"><span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Paid</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap cell-status"><span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">Paid</span></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                    <a href="#" class="text-red-500 hover:underline">View</a>
+                                    <button class="text-red-500 hover:underline view-statement-btn">View</button>
                                 </td>
                             </tr>
-                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">INV-2025-09-002</td>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">52649</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-white">Fatima Al-Mutairi</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">01 Sep 2025</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">15 Sep 2025</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-800 dark:text-white">SAR 42.75</td>
-                                <td class="px-6 py-4 whitespace-nowrap"><span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">Overdue</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap cell-status"><span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300">Overdue</span></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-4">
-                                    <a href="#" class="text-red-500 hover:underline">View</a>
+                                    <button class="text-red-500 hover:underline view-statement-btn">View</button>
                                     <button class="text-red-500 hover:underline open-adjustment-modal">Adjust</button>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">INV-2025-10-003</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-white">Mohammed Al-Ghamdi</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">52650</td>
+                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-800 dark:text-white">Mohammed Al-Ghamdi</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">01 Oct 2025</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">15 Oct 2025</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-800 dark:text-white">SAR 112.00</td>
-                                <td class="px-6 py-4 whitespace-nowrap"><span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">Due</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap cell-status"><span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">Due</span></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-4">
-                                    <a href="#" class="text-red-500 hover:underline">View</a>
+                                    <button class="text-red-500 hover:underline view-statement-btn">View</button>
                                     <button class="text-red-500 hover:underline open-adjustment-modal">Adjust</button>
                                 </td>
                             </tr>
@@ -130,7 +172,7 @@
             </div>
 
             <div id="content-tariffs" class="tab-content hidden">
-                 <div class="flex justify-between items-center mb-6">
+                <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Water Tariff Plans (NWC)</h2>
                     <button id="add-tariff-btn" class="bg-red-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2 whitespace-nowrap">
                         <i class="fas fa-plus"></i>
@@ -145,9 +187,9 @@
                                 <p class="text-sm text-slate-500 dark:text-slate-400">Tiered pricing for residential customers.</p>
                                 <span class="text-xs mt-2 inline-block font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 px-2 py-1 rounded-full">Seasonal adjustments may apply</span>
                             </div>
-                            <button class="text-red-500 hover:underline font-semibold text-sm">Edit</button>
+                            <button class="edit-tariff-btn text-red-500 hover:underline font-semibold text-sm">Edit</button>
                         </div>
-                        <ul class="space-y-3 text-sm">
+                        <ul class="tariff-tier-list space-y-3 text-sm">
                             <li class="flex justify-between p-3 rounded-md bg-slate-50 dark:bg-gray-700/50"><span>Consumption 0 - 15 m³</span> <span class="font-semibold font-mono">0.10 SAR / m³</span></li>
                             <li class="flex justify-between p-3 rounded-md bg-slate-50 dark:bg-gray-700/50"><span>Consumption 16 - 30 m³</span> <span class="font-semibold font-mono">1.00 SAR / m³</span></li>
                             <li class="flex justify-between p-3 rounded-md bg-slate-50 dark:bg-gray-700/50"><span>Consumption 31 - 45 m³</span> <span class="font-semibold font-mono">3.00 SAR / m³</span></li>
@@ -160,19 +202,19 @@
                                 <h3 class="text-xl font-bold text-slate-800 dark:text-white">Commercial & Industrial Tariff</h3>
                                 <p class="text-sm text-slate-500 dark:text-slate-400">Tiered pricing for non-residential customers.</p>
                             </div>
-                            <button class="text-red-500 hover:underline font-semibold text-sm">Edit</button>
+                            <button class="edit-tariff-btn text-red-500 hover:underline font-semibold text-sm">Edit</button>
                         </div>
-                        <ul class="space-y-3 text-sm">
-                           <li class="flex justify-between p-3 rounded-md bg-slate-50 dark:bg-gray-700/50"><span>Consumption 0 - 50 m³</span> <span class="font-semibold font-mono">1.50 SAR / m³</span></li>
+                        <ul class="tariff-tier-list space-y-3 text-sm">
+                            <li class="flex justify-between p-3 rounded-md bg-slate-50 dark:bg-gray-700/50"><span>Consumption 0 - 50 m³</span> <span class="font-semibold font-mono">1.50 SAR / m³</span></li>
                             <li class="flex justify-between p-3 rounded-md bg-slate-50 dark:bg-gray-700/50"><span>Consumption > 50 m³</span> <span class="font-semibold font-mono">7.00 SAR / m³</span></li>
                         </ul>
                     </div>
-                </div>
+                 </div>
             </div>
 
             <div id="content-payments" class="tab-content hidden space-y-8">
                 <div>
-                    <h2 class="text-2xl font-bold mb-4 text-slate-900 dark:text-white">Payment Gateway Integration</h2>
+                    <h2 class="text-2xl font-bold mb-4 text-slate-900 dark:text-white">Connected Payment Gateways</h2>
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-slate-200 dark:border-gray-700">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/50">
@@ -183,16 +225,15 @@
                                 <p class="text-sm text-slate-500 dark:text-slate-400">Status: <span class="font-semibold text-green-600 dark:text-green-400">Connected & Active</span></p>
                             </div>
                         </div>
-                    </div>
+                     </div>
                 </div>
-
                 <div>
                     <h2 class="text-2xl font-bold mb-4 text-slate-900 dark:text-white">Settlement Logs</h2>
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-x-auto border border-slate-200 dark:border-gray-700">
-                        <table class="min-w-full">
+                         <table class="min-w-full">
                             <thead class="bg-slate-50 dark:bg-gray-700/50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Transaction ID</th>
+                                     <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Transaction ID</th>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Date</th>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Amount</th>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Invoice ID</th>
@@ -204,15 +245,15 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">PT2509-A4B7C1</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">20 Sep 2025</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">SAR 85.50</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">INV-2025-09-001</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">52648</td>
                                     <td class="px-6 py-4 whitespace-nowrap"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">Settled</span></td>
                                 </tr>
                                  <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">PT2508-X9Y8Z7</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">18 Aug 2025</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">SAR 91.20</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">INV-2025-08-001</td>
-                                    <td class="px-6 py-4 whitespace-nowrap"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">Settled</span></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-slate-600 dark:text-slate-300">52641</td>
+                                     <td class="px-6 py-4 whitespace-nowrap"><span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">Settled</span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -224,62 +265,62 @@
 
     <div id="batch-invoice-modal" class="fixed inset-0 z-50 hidden items-center justify-center overflow-y-auto">
         <div class="modal-backdrop fixed inset-0"></div>
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg m-4 z-10">
-            <div class="flex justify-between items-center p-5 border-b border-slate-200 dark:border-gray-700">
-                <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Generate Batch Invoices</h3>
-                <button data-close-modal="batch-invoice-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            <div class="p-6">
-                <p class="text-slate-600 dark:text-slate-300 mb-4">Please select the billing period to generate invoices for all active customers.</p>
-                <div class="grid grid-cols-2 gap-4">
+       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg m-4 z-10">
+           <div class="flex justify-between items-center p-5 border-b border-slate-200 dark:border-gray-700">
+               <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Generate Batch Invoices</h3>
+               <button data-close-modal="batch-invoice-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fas fa-times text-xl"></i></button>
+           </div>
+           <div class="p-6">
+               <p class="text-slate-600 dark:text-slate-300 mb-4">Please select the billing period to generate invoices for all active customers.</p>
+               <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label for="billing-month" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Month</label>
-                        <select id="billing-month" class="mt-1 w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
-                            <option>September</option><option>October</option><option>November</option>
-                        </select>
+                       <select id="billing-month" class="mt-1 w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
+                           <option>September</option><option>October</option><option>November</option>
+                       </select>
                     </div>
-                    <div>
-                        <label for="billing-year" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Year</label>
-                        <input type="number" id="billing-year" value="2025" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
-                    </div>
-                </div>
-            </div>
-            <div class="flex justify-end items-center p-5 border-t border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/50 rounded-b-lg">
-                <button data-close-modal="batch-invoice-modal" type="button" class="bg-white dark:bg-gray-700 py-2 px-4 border border-slate-300 dark:border-gray-600 rounded-md text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-gray-600">Cancel</button>
-                <button type="button" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Generate Invoices</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="create-invoice-modal" class="fixed inset-0 z-50 hidden items-center justify-center overflow-y-auto">
-        <div class="modal-backdrop fixed inset-0"></div>
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg m-4 z-10">
-            <div class="flex justify-between items-center p-5 border-b border-slate-200 dark:border-gray-700">
-                <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Create Manual Invoice</h3>
-                <button data-close-modal="create-invoice-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            <div class="p-6 space-y-4">
+                   <div>
+                       <label for="billing-year" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Year</label>
+                       <input type="number" id="billing-year" value="2025" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
+                   </div>
+               </div>
+           </div>
+           <div class="flex justify-end items-center p-5 border-t border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/50 rounded-b-lg">
+               <button data-close-modal="batch-invoice-modal" type="button" class="bg-white dark:bg-gray-700 py-2 px-4 border border-slate-300 dark:border-gray-600 rounded-md text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-gray-600">Cancel</button>
+               <button type="button" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Generate Invoices</button>
+           </div>
+       </div>
+   </div>
+   
+   <div id="create-invoice-modal" class="fixed inset-0 z-50 hidden items-center justify-center overflow-y-auto">
+       <div class="modal-backdrop fixed inset-0"></div>
+       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg m-4 z-10">
+           <div class="flex justify-between items-center p-5 border-b border-slate-200 dark:border-gray-700">
+               <h3 class="text-xl font-semibold text-slate-900 dark:text-white">Create Manual Invoice</h3>
+               <button data-close-modal="create-invoice-modal" class="text-slate-400 hover:text-slate-600 dark:hover:text-white"><i class="fas fa-times text-xl"></i></button>
+           </div>
+           <div class="p-6 space-y-4">
                 <div>
-                    <label for="customer-select" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Customer</label>
-                    <select id="customer-select" class="mt-1 w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
-                        <option>Abdullah Al-Qahtani</option><option>Fatima Al-Mutairi</option><option>Mohammed Al-Ghamdi</option>
+                   <label for="customer-select" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Customer</label>
+                   <select id="customer-select" class="mt-1 w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
+                       <option>Abdullah Al-Qahtani</option><option>Fatima Al-Mutairi</option><option>Mohammed Al-Ghamdi</option>
                     </select>
-                </div>
-                <div>
-                    <label for="manual-amount" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Amount (SAR)</label>
-                    <input type="number" step="0.01" id="manual-amount" placeholder="e.g., 50.00" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
-                </div>
-                <div>
-                    <label for="manual-description" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Description</label>
-                    <textarea id="manual-description" rows="3" placeholder="e.g., Charge for special meter reading" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm"></textarea>
-                </div>
-            </div>
-            <div class="flex justify-end items-center p-5 border-t border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/50 rounded-b-lg">
-                <button data-close-modal="create-invoice-modal" type="button" class="bg-white dark:bg-gray-700 py-2 px-4 border border-slate-300 dark:border-gray-600 rounded-md text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-gray-600">Cancel</button>
-                <button type="button" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Create & Send</button>
-            </div>
-        </div>
-    </div>
+               </div>
+               <div>
+                   <label for="manual-amount" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Amount (SAR)</label>
+                   <input type="number" step="0.01" id="manual-amount" placeholder="e.g., 50.00" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
+               </div>
+               <div>
+                   <label for="manual-description" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Description</label>
+                   <textarea id="manual-description" rows="3" placeholder="e.g., Charge for special meter reading" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm"></textarea>
+               </div>
+           </div>
+           <div class="flex justify-end items-center p-5 border-t border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/50 rounded-b-lg">
+               <button data-close-modal="create-invoice-modal" type="button" class="bg-white dark:bg-gray-700 py-2 px-4 border border-slate-300 dark:border-gray-600 rounded-md text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-gray-600">Cancel</button>
+               <button type="button" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Create & Send</button>
+           </div>
+       </div>
+   </div>
 
     <div id="adjustment-modal" class="fixed inset-0 z-50 hidden items-center justify-center overflow-y-auto">
         <div class="modal-backdrop fixed inset-0"></div>
@@ -294,22 +335,22 @@
                     <div>
                         <label for="adjustment-type" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Adjustment Type</label>
                         <select id="adjustment-type" class="mt-1 w-full rounded-md border-slate-300 dark:border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white dark:bg-gray-700 sm:text-sm">
-                            <option>Discount</option><option>Late Fee Penalty</option><option>Credit Note</option><option>Correction</option>
+                             <option>Discount</option><option>Late Fee Penalty</option><option>Credit Note</option><option>Correction</option>
                         </select>
                     </div>
                     <div>
-                        <label for="adjustment-amount" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Amount (SAR)</label>
+                         <label for="adjustment-amount" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Amount (SAR)</label>
                         <input type="number" step="0.01" id="adjustment-amount" placeholder="e.g., -10.00 for a discount" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white dark:bg-gray-700 sm:text-sm">
                     </div>
-                     <div>
+                    <div>
                         <label for="adjustment-reason" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Reason</label>
                         <textarea id="adjustment-reason" rows="3" placeholder="e.g., Goodwill gesture for service disruption" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white dark:bg-gray-700 sm:text-sm"></textarea>
-                    </div>
+                     </div>
                 </form>
             </div>
             <div class="flex justify-end items-center p-5 border-t border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/50 rounded-b-lg">
                 <button data-close-modal="adjustment-modal" type="button" class="bg-white dark:bg-gray-700 py-2 px-4 border border-slate-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-gray-600">Cancel</button>
-                <button type="submit" form="adjustment-form" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Apply Adjustment</button>
+                 <button type="submit" form="adjustment-form" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Apply Adjustment</button>
             </div>
         </div>
     </div>
@@ -323,39 +364,108 @@
             </div>
             <div class="p-6 max-h-[60vh] overflow-y-auto">
                 <form id="add-tariff-form" class="space-y-4">
-                    <div>
+                     <div>
                         <label for="tariff-name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Tariff Name</label>
                         <input type="text" id="tariff-name" placeholder="e.g., Agricultural Sector Tariff" class="mt-1 block w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
-                    </div>
+                     </div>
                     <div>
                         <label for="tariff-type" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Customer Type</label>
                         <select id="tariff-type" class="mt-1 w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
-                            <option>Agricultural</option><option>Government</option><option>Special Economic Zone</option>
+                             <option>Agricultural</option><option>Government</option><option>Special Economic Zone</option>
                         </select>
                     </div>
                      <div id="tariff-tiers-container">
-                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Block Tariffs (Tiers)</label>
+                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Block Tariffs (Tiers)</label>
                         <div class="flex items-center gap-2 mt-2">
                             <input type="text" placeholder="From (m³)" value="0" class="w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
-                            <input type="text" placeholder="To (m³)" value="100" class="w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
+                             <input type="text" placeholder="To (m³)" value="100" class="w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
                             <input type="number" step="0.01" placeholder="Rate (SAR)" class="w-full rounded-md border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-700 sm:text-sm">
                         </div>
-                    </div>
+                     </div>
                     <button type="button" id="add-tier-btn" class="text-sm font-semibold text-red-600 hover:text-red-500">+ Add Tier</button>
                 </form>
-             </div>
+            </div>
             <div class="flex justify-end items-center p-5 border-t border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800/50 rounded-b-lg">
-                <button data-close-modal="add-tariff-modal" type="button" class="bg-white dark:bg-gray-700 py-2 px-4 border border-slate-300 dark:border-gray-600 rounded-md text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-gray-600">Cancel</button>
+                 <button data-close-modal="add-tariff-modal" type="button" class="bg-white dark:bg-gray-700 py-2 px-4 border border-slate-300 dark:border-gray-600 rounded-md text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-gray-600">Cancel</button>
                 <button type="submit" form="add-tariff-form" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">Save Tariff</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="invoice-details-modal" class="fixed inset-0 z-50 hidden items-center justify-center overflow-y-auto">
+        <div class="modal-backdrop fixed inset-0 bg-black bg-opacity-50"></div>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl m-4 z-10 text-slate-800 dark:text-slate-200">
+            <div id="receipt-content-to-download">
+                <div class="bg-red-800 text-white p-4 rounded-t-lg">
+                    <h2 class="text-2xl font-bold">Water Service Bill</h2>
+                    <p class="text-sm">Simplified Tax Invoice (VAT Number: 300184159100003)</p>
+                </div>
+                <div class="p-6 border-x border-b border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                    <section class="grid grid-cols-2 gap-8 pb-4 border-b border-slate-200 dark:border-gray-600">
+                        <div>
+                            <h3 class="font-bold text-red-800 dark:text-red-500 mb-2">Customer Information</h3>
+                            <div class="grid grid-cols-[auto,1fr] gap-x-4 gap-y-1 text-sm">
+                                <span class="font-semibold">Name:</span> <span id="modal-customer-name"></span>
+                                <span class="font-semibold">Address:</span> <span>1234 Olaya St, Al-Sulimaniah, Riyadh 12245</span>
+                                <span class="font-semibold">Account Number:</span> <span id="modal-account-number">987-654-3210</span>
+                                <span class="font-semibold">Meter Number:</span> <span>65315101</span>
+                                <span class="font-semibold">Meter Diameter:</span> <span>2 inches</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-red-800 dark:text-red-500 mb-2">Bill Details</h3>
+                            <div class="grid grid-cols-[auto,1fr] gap-x-4 gap-y-1 text-sm">
+                                <span class="font-semibold">Bill Number:</span> <span id="modal-invoice-id"></span>
+                                <span class="font-semibold">Bill Issue Date:</span> <span id="modal-issue-date"></span>
+                                <span class="font-semibold">Due Date:</span> <span id="modal-due-date"></span>
+                                <span class="font-semibold">Bill Period:</span> <span>30 Days</span>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="mt-6">
+                        <h3 class="font-bold text-red-800 dark:text-red-500 mb-2">Consumption Details</h3>
+                        <div class="grid grid-cols-3 gap-4 text-center text-sm">
+                            <div class="bg-slate-100 dark:bg-gray-700 p-3 rounded-lg"><p>Start Consumption Date</p><p class="font-bold text-base">2025-08-03</p></div>
+                            <div class="bg-slate-100 dark:bg-gray-700 p-3 rounded-lg"><p>End Consumption Date</p><p class="font-bold text-base">2025-09-02</p></div>
+                            <div class="bg-slate-100 dark:bg-gray-700 p-3 rounded-lg"><p>Total Consumption</p><p class="font-bold text-base">1150 gal</p></div>
+                        </div>
+                    </section>
+                    <section class="mt-6">
+                        <h3 class="font-bold text-red-800 dark:text-red-500 mb-2">Billing Summary</h3>
+                        <table class="w-full text-sm">
+                            <thead class="bg-slate-100 dark:bg-gray-700/50">
+                                <tr>
+                                    <th class="p-2 font-bold text-left">Bill Information</th>
+                                    <th class="p-2 font-bold text-right">Before VAT (SAR)</th>
+                                    <th class="p-2 font-bold text-right">VAT (15%)</th>
+                                    <th class="p-2 font-bold text-right">After VAT (SAR)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-gray-700">
+                                <tr><td class="p-2">Water Consumption Value</td><td class="p-2 text-right font-mono">380.00</td><td class="p-2 text-right font-mono">57.00</td><td class="p-2 text-right font-mono">437.00</td></tr>
+                                <tr><td class="p-2">Sewer Service</td><td class="p-2 text-right font-mono">5.30</td><td class="p-2 text-right font-mono">0.79</td><td class="p-2 text-right font-mono">6.09</td></tr>
+                                <tr><td class="p-2">Meter Tariff Fees</td><td class="p-2 text-right font-mono">6.00</td><td class="p-2 text-right font-mono">0.90</td><td class="p-2 text-right font-mono">6.90</td></tr>
+                            </tbody>
+                            <tfoot class="border-t-2 border-slate-300 dark:border-gray-500 font-bold">
+                                <tr><td class="p-2">Total (SAR)</td><td class="p-2 text-right font-mono">391.30</td><td class="p-2 text-right font-mono">58.69</td><td id="modal-total-amount-table" class="p-2 text-right font-mono"></td></tr>
+                            </tfoot>
+                        </table>
+                    </section>
+                    <section class="mt-6 grid grid-cols-2 gap-6 items-center">
+                        <div class="bg-slate-100 dark:bg-gray-700 p-4 rounded-lg text-center"><p class="text-sm">Current Consumption is equivalent to</p><p class="text-3xl font-bold text-red-800 dark:text-red-500 my-1">0.24</p><p>Tankers (~4,755 gal per tanker)</p><span class="text-5xl opacity-80">🚚</span></div>
+                        <div class="bg-red-800 text-white p-4 rounded-lg text-center shadow-lg"><p class="text-base opacity-80">Total Amount (SAR)</p><p id="modal-total-amount-box" class="text-5xl font-bold my-1"></p><div class="text-xs mt-2"><span>Due Start Date: <span id="modal-footer-issue-date"></span></span> | <span>Payment Deadline: <span id="modal-footer-due-date"></span></span></div></div>
+                    </section>
+                </div>
+            </div>
+            <div class="flex justify-end items-center gap-3 p-4 bg-slate-50 dark:bg-gray-900/50 rounded-b-lg">
+                <button id="download-pdf-btn" type="button" class="bg-red-700 text-white font-semibold px-5 py-2 rounded-lg hover:bg-red-800 flex items-center gap-2"><i class="fas fa-download"></i> Download PDF</button>
+                <button data-close-modal="invoice-details-modal" type="button" class="bg-slate-200 dark:bg-slate-600 py-2 px-5 rounded-md text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-500">Close</button>
             </div>
         </div>
     </div>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- DELETED a redundant block of code that handled theme toggle and dropdown ---
-            // The logic is now correctly handled by the included 'scripts_ad.ejs' file.
-
             // --- Tab Switching Logic ---
             const tabs = document.querySelectorAll('.tab-link');
             const contents = document.querySelectorAll('.tab-content');
@@ -376,40 +486,87 @@
             // --- Generic Modal Handling ---
             const openModal = (modalId) => {
                 const modal = document.getElementById(modalId);
-                if (modal) {
-                    modal.classList.add('flex');
-                    modal.classList.remove('hidden');
-                }
+                if (modal) modal.classList.replace('hidden', 'flex');
             };
-
             const closeModal = (modalId) => {
                 const modal = document.getElementById(modalId);
-                if (modal) {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                }
+                if (modal) modal.classList.replace('flex', 'hidden');
             };
-
             document.querySelectorAll('[data-close-modal]').forEach(el => {
                 el.addEventListener('click', () => closeModal(el.dataset.closeModal));
             });
-
             document.querySelectorAll('.modal-backdrop').forEach(el => {
                 el.addEventListener('click', (e) => closeModal(e.target.closest('.fixed').id));
             });
-            
-            // --- Specific Modal Triggers & Logic ---
 
-            // Generate Batch Invoice Modal
+            // --- Specific Modal Triggers ---
             document.getElementById('generate-batch-btn').addEventListener('click', () => openModal('batch-invoice-modal'));
-
-            // Create Manual Invoice Modal
             document.getElementById('create-invoice-btn').addEventListener('click', () => openModal('create-invoice-modal'));
-
-            // Add New Tariff Modal
             document.getElementById('add-tariff-btn').addEventListener('click', () => openModal('add-tariff-modal'));
+            
+            document.querySelectorAll('.open-adjustment-modal').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const row = e.target.closest('tr');
+                    document.getElementById('adj-invoice-id').textContent = row.cells[0].textContent;
+                    document.getElementById('adj-customer-name').textContent = row.cells[1].textContent;
+                    openModal('adjustment-modal');
+                });
+            });
 
-            // Dynamic Tariff Tier Addition
+            // --- KPI Card Filtering Logic ---
+            const kpiCards = document.querySelectorAll('.kpi-card');
+            const invoiceRows = document.querySelectorAll('#invoices-table-body tr');
+            kpiCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    kpiCards.forEach(c => c.classList.replace('border-red-500', 'border-transparent'));
+                    card.classList.replace('border-transparent', 'border-red-500');
+                    const filter = card.id.replace('kpi-', '');
+                    invoiceRows.forEach(row => {
+                        const status = row.querySelector('.cell-status span').textContent.trim().toLowerCase();
+                        let showRow = (filter === 'total' || (filter === 'settled' && status === 'paid') || (filter === 'due' && status === 'due') || (filter === 'overdue' && status === 'overdue'));
+                        row.style.display = showRow ? '' : 'none';
+                    });
+                });
+            });
+
+            // --- Invoice Details Modal Logic ---
+            document.getElementById('invoices-table-body').addEventListener('click', e => {
+                if (e.target.classList.contains('view-statement-btn')) {
+                    const row = e.target.closest('tr');
+                    const invoiceId = row.cells[0].textContent.trim();
+                    const customerName = row.cells[1].textContent.trim();
+                    const issueDate = row.cells[2].textContent.trim();
+                    const dueDate = row.cells[3].textContent.trim();
+                    const totalAmount = row.cells[4].textContent.trim().replace('SAR ', '');
+                    document.getElementById('modal-customer-name').textContent = customerName;
+                    document.getElementById('modal-invoice-id').textContent = invoiceId;
+                    document.getElementById('modal-issue-date').textContent = issueDate;
+                    document.getElementById('modal-due-date').textContent = dueDate;
+                    document.getElementById('modal-total-amount-table').textContent = totalAmount;
+                    document.getElementById('modal-total-amount-box').textContent = totalAmount;
+                    document.getElementById('modal-footer-issue-date').textContent = issueDate;
+                    document.getElementById('modal-footer-due-date').textContent = dueDate;
+                    openModal('invoice-details-modal');
+                }
+            });
+
+            // --- PDF Download Logic ---
+            document.getElementById('download-pdf-btn').addEventListener('click', () => {
+                const { jsPDF } = window.jspdf;
+                const content = document.getElementById('receipt-content-to-download');
+                const invoiceId = document.getElementById('modal-invoice-id').textContent;
+                const fileName = `invoice-${invoiceId}.pdf`;
+                html2canvas(content, { scale: 2, useCORS: true }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' });
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                    pdf.save(fileName);
+                });
+            });
+
+            // --- Tariff Engine Logic ---
             document.getElementById('add-tier-btn').addEventListener('click', () => {
                 const container = document.getElementById('tariff-tiers-container');
                 const newTier = document.createElement('div');
@@ -422,22 +579,34 @@
                 container.appendChild(newTier);
             });
 
-            // Invoice Adjustment Modal (with dynamic data)
-            document.querySelectorAll('.open-adjustment-modal').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const row = e.target.closest('tr');
-                    const invoiceId = row.cells[0].textContent;
-                    const customerName = row.cells[1].textContent;
-
-                    document.getElementById('adj-invoice-id').textContent = invoiceId;
-                    document.getElementById('adj-customer-name').textContent = customerName;
-                    
-                    openModal('adjustment-modal');
+            document.querySelectorAll('.edit-tariff-btn').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    const button = e.target;
+                    const tierList = button.closest('.bg-white').querySelector('.tariff-tier-list');
+                    if (button.textContent === 'Edit') {
+                        tierList.querySelectorAll('li').forEach(li => {
+                            const descSpan = li.children[0];
+                            const rateSpan = li.children[1];
+                            descSpan.innerHTML = `<input type="text" class="w-full bg-slate-100 dark:bg-gray-800 p-1 rounded" value="${descSpan.textContent}">`;
+                            rateSpan.innerHTML = `<input type="text" class="w-full bg-slate-100 dark:bg-gray-800 p-1 rounded text-right font-mono" value="${rateSpan.textContent}">`;
+                        });
+                        button.textContent = 'Save';
+                        button.classList.add('text-green-500');
+                    } else {
+                        tierList.querySelectorAll('li').forEach(li => {
+                            const descInput = li.children[0].querySelector('input');
+                            const rateInput = li.children[1].querySelector('input');
+                            li.children[0].textContent = descInput.value;
+                            li.children[1].textContent = rateInput.value;
+                        });
+                        button.textContent = 'Edit';
+                        button.classList.remove('text-green-500');
+                    }
                 });
             });
         });
     </script>
-        <footer class="fixed bottom-4 right-4 text-xs text-slate-500 dark:text-slate-400">
+    <footer class="fixed bottom-4 right-4 text-xs text-slate-500 dark:text-slate-400">
         <p>© REVARTIX Confidential, REVARTIX, All Rights Reserved. 2025.</p>
         <p class="text-right">www.revartix.com | Reva.support@revartix.com</p>
     </footer>
