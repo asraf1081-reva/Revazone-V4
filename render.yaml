@@ -1,0 +1,48 @@
+services:
+  # Web Service (Node.js Application)
+  - type: web
+    name: reva-app
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: CONTACT_EMAIL
+        value: reva.zone@revartix.com
+      # Database connection will be set automatically by Render
+      - key: PGHOST
+        fromDatabase:
+          name: reva-db
+          property: host
+      - key: PGPORT
+        fromDatabase:
+          name: reva-db
+          property: port
+      - key: PGDATABASE
+        fromDatabase:
+          name: reva-db
+          property: database
+      - key: PGUSER
+        fromDatabase:
+          name: reva-db
+          property: user
+      - key: PGPASSWORD
+        fromDatabase:
+          name: reva-db
+          property: password
+    healthCheckPath: /
+    autoDeploy: true
+
+  # PostgreSQL Database
+  - type: pspg
+    name: reva-db
+    plan: free
+    databaseName: reva_db
+    user: reva_user
+

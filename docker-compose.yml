@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database Service
+  db:
+    image: postgres:15-alpine
+    container_name: reva-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-reva_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-reva_password}
+      POSTGRES_DB: ${DB_NAME:-reva_db}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-reva_user} -d ${DB_NAME:-reva_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - reva-network
+
+  # Node.js Application Service (Backend + Frontend)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: reva-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-4000}:4000"
+    environment:
+      # Database connection
+      PGUSER: ${DB_USER:-reva_user}
+      PGPASSWORD: ${DB_PASSWORD:-reva_password}
+      PGDATABASE: ${DB_NAME:-reva_db}
+      PGHOST: db
+      PGPORT: 5432
+      # Application settings
+      PORT: 4000
+      NODE_ENV: ${NODE_ENV:-production}
+      # Session secret
+      SESSION_SECRET: ${SESSION_SECRET:-a-secure-secret-key-for-revartix}
+      # Optional: SMTP settings (if needed)
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      # Optional: Other environment variables
+      CONTACT_EMAIL: ${CONTACT_EMAIL:-reva.zone@revartix.com}
+      METER_API_BASE: ${METER_API_BASE:-}
+      METER_API_HEALTH_URL: ${METER_API_HEALTH_URL:-}
+      JOBS_HEALTH_URL: ${JOBS_HEALTH_URL:-}
+      TLS_CHECK_HOST: ${TLS_CHECK_HOST:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./Public/uploads:/usr/src/app/Public/uploads
+      - ./temp_downloads:/usr/src/app/temp_downloads
+    networks:
+      - reva-network
+    command: >
+      sh -c "
+        echo 'Waiting for database to be ready...' &&
+        sleep 5 &&
+        node seed.js &&
+        node index.js
+      "
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  reva-network:
+    driver: bridge
+
